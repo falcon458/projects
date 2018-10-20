@@ -69,7 +69,7 @@ namespace SeriesUI.BusinessLogic
                     for (var j = 0; j < episodeNames.Count; j++)
                     {
                         // Translate HTML characters
-                        var episode = new Episode(WebUtility.HtmlDecode(episodeNames[j].ToString()));
+                        var episode = new Episode(Name + " - " + WebUtility.HtmlDecode(episodeNames[j].ToString()));
                         if (DateTime.TryParseExact(episodeDates[j].ToString(), "dd/MM/yyyy",
                             CultureInfo.InvariantCulture, DateTimeStyles.None, out var airDate))
                         {

@@ -46,11 +46,7 @@ namespace SeriesUI
 
                 var series = listBoxSeries.SelectedItem as Series;
                 if (int.TryParse(label.Content.ToString(), out var season))
-                {
-                    textBox.Text = "";
-                    foreach (var episode in series.Seasons[season - 1].Episodes)
-                        textBox.Text += $"{episode.Title}\n";
-                }
+                    grdEpisodes.ItemsSource = series.Seasons[season - 1].Episodes;
             }
         }
 
@@ -97,7 +93,7 @@ namespace SeriesUI
             var labelSpacing = double.Parse(ConfigurationManager.AppSettings["labelSpacing"]);
 
             DeleteSeasonLabels();
-            textBox.Text = "";
+            grdEpisodes.ItemsSource = null;
 
             var series = (sender as ListBox)?.SelectedItem as Series;
 
@@ -126,6 +122,9 @@ namespace SeriesUI
 
                 grdSeasons.Children.Add(lbl);
             }
+
+            // Select last season
+            OnLabelMouseClick(grdSeasons.Children[grdSeasons.Children.Count - 1], new EventArgs());
         }
 
         private void btnRefresh_Click(object sender, RoutedEventArgs e)
@@ -177,19 +176,30 @@ namespace SeriesUI
 
         private void btnReload_Click(object sender, RoutedEventArgs e)
         {
-            // Create the formatter you want to use to serialize the object.
+            // Create the formatter to serialize the object.
             IFormatter formatter = new BinaryFormatter();
+
             // Create the stream that the serialized data will be buffered too.
             var buffer = File.OpenRead(@"C:\temp\series.txt");
+
             // Invoke the Deserialize method.
             SeriesList = formatter.Deserialize(buffer) as List<Series>;
+
             // Close the stream.
             buffer.Close();
 
             listBoxSeries.Items.Clear();
             listBoxSeries.Items.Refresh();
 
-            foreach (var series in SeriesList) listBoxSeries.Items.Add(series);
+            if (SeriesList != null)
+                foreach (var series in SeriesList)
+                    listBoxSeries.Items.Add(series);
+        }
+
+        private void btnDebug_Click(object sender, RoutedEventArgs e)
+        {
+            SeriesList[0].Seasons[0].Episodes[2].Downloaded = true;
+            grdEpisodes.ItemsSource = SeriesList[0].Seasons[0].Episodes;
         }
     }
 }

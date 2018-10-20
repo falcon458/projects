@@ -6,14 +6,38 @@
         xmlns:local="clr-namespace:SeriesUI"
         mc:Ignorable="d"
         Name="mainWindow"
-        Title="Series" Height="589.767" Width="800">
+        Title="Series" Height="589.767" Width="844.225">
     <Grid Margin="0,-24,0,0">
-        <ListBox x:Name="listBoxSeries" DisplayMemberPath = "Name" HorizontalAlignment="Left" Height="353" Margin="25,70,0,0" VerticalAlignment="Top" Width="187" SelectionChanged="listBoxSeries_SelectionChanged"/>
-        <Grid x:Name="grdSeasons" HorizontalAlignment="Left" Height="40" Margin="229,25,0,0" VerticalAlignment="Top" Width="553"/>
-        <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="488" Margin="229,70,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="446"/>
-        <Button x:Name="btnSave" Content="Save" HorizontalAlignment="Left" Margin="85,494,0,0" VerticalAlignment="Top" Width="75" Click="btnSave_Click"/>
-        <Button x:Name="btnRefresh" Content="Refresh" HorizontalAlignment="Left" Margin="85,444,0,0" VerticalAlignment="Top" Width="75" Click="btnRefresh_Click"/>
-        <Button x:Name="btnReload" Content="Reload" HorizontalAlignment="Left" Margin="85,469,0,0" VerticalAlignment="Top" Width="75" Click="btnReload_Click"/>
+        <ListBox x:Name="listBoxSeries" DisplayMemberPath="Name" HorizontalAlignment="Left" Height="353"
+                 Margin="25,70,0,0" VerticalAlignment="Top" Width="187"
+                 SelectionChanged="listBoxSeries_SelectionChanged" />
+        <Grid x:Name="grdSeasons" HorizontalAlignment="Left" Height="40" Margin="229,25,0,0" VerticalAlignment="Top"
+              Width="553" />
+        <Button x:Name="btnSave" Content="Save" HorizontalAlignment="Left" Margin="85,494,0,0" VerticalAlignment="Top"
+                Width="75" Click="btnSave_Click" />
+        <Button x:Name="btnRefresh" Content="Refresh" HorizontalAlignment="Left" Margin="85,444,0,0"
+                VerticalAlignment="Top" Width="75" Click="btnRefresh_Click" />
+        <Button x:Name="btnReload" Content="Reload" HorizontalAlignment="Left" Margin="85,469,0,0"
+                VerticalAlignment="Top" Width="75" Click="btnReload_Click" />
+        <Button x:Name="btnDebug" Content="Debug" HorizontalAlignment="Left" Margin="85,538,0,0"
+                VerticalAlignment="Top" Width="75" RenderTransformOrigin="-0.025,-0.338" Click="btnDebug_Click" />
+        <DataGrid x:Name="grdEpisodes" Margin="229,70,10,10" AutoGenerateColumns="False" FontFamily="Verdana">
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding AirDate, StringFormat=d, ConverterCulture=en-GB}" ClipboardContentBinding="{x:Null}" Header="Date"/>
+                <DataGridTextColumn Binding="{Binding Title}" ClipboardContentBinding="{x:Null}" Header="Title"/>
+                <!--From https://stackoverflow.com/questions/3833536/how-to-perform-single-click-checkbox-selection-in-wpf-datagrid-->
+                <DataGridTemplateColumn MinWidth="20" Header="Downloaded">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center"
+                                          IsChecked="{Binding Downloaded, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
 
     </Grid>
 </Window>
