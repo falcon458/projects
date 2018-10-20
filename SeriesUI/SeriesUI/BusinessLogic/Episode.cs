@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace SeriesUI.BusinessLogic
 {
+    [Serializable]
     internal class Episode
     {
         public Episode()

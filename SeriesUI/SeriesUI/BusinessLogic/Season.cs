@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace SeriesUI.BusinessLogic
 {
+    [Serializable]
     internal class Season
     {
         public Season(int sequence)

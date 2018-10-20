@@ -1,12 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using SeriesUI.BusinessLogic;
+
+// Todo:
+// DataBinding --> Separate UI from code
+// Serialization
+
 
 namespace SeriesUI
 {
@@ -21,6 +29,8 @@ namespace SeriesUI
         }
 
         private int ActiveSeason { get; set; }
+
+        private List<Series> SeriesList { get; set; }
 
         private void OnLabelMouseClick(object sender, EventArgs e)
         {
@@ -127,7 +137,7 @@ namespace SeriesUI
             {
                 Cursor = Cursors.Wait;
 
-                var seriesList = new List<Series>
+                SeriesList = new List<Series>
                 {
                     new Series
                     {
@@ -143,7 +153,7 @@ namespace SeriesUI
                     }
                 };
 
-                foreach (var series in seriesList)
+                foreach (var series in SeriesList)
                 {
                     series.GetDataFromWebsite();
 
@@ -154,6 +164,32 @@ namespace SeriesUI
             {
                 Cursor = Cursors.Arrow;
             }
+        }
+
+        private void btnSave_Click(object sender, RoutedEventArgs e)
+        {
+            // Save application
+            IFormatter formatter = new BinaryFormatter();
+            var buffer = File.Create(@"C:\temp\series.txt");
+            formatter.Serialize(buffer, SeriesList);
+            buffer.Close();
+        }
+
+        private void btnReload_Click(object sender, RoutedEventArgs e)
+        {
+            // Create the formatter you want to use to serialize the object.
+            IFormatter formatter = new BinaryFormatter();
+            // Create the stream that the serialized data will be buffered too.
+            var buffer = File.OpenRead(@"C:\temp\series.txt");
+            // Invoke the Deserialize method.
+            SeriesList = formatter.Deserialize(buffer) as List<Series>;
+            // Close the stream.
+            buffer.Close();
+
+            listBoxSeries.Items.Clear();
+            listBoxSeries.Items.Refresh();
+
+            foreach (var series in SeriesList) listBoxSeries.Items.Add(series);
         }
     }
 }
