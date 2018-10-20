@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2035
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeriesUI", "SeriesUI\SeriesUI.csproj", "{1A23E460-F713-4230-B101-9458AF635DAD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1A23E460-F713-4230-B101-9458AF635DAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A23E460-F713-4230-B101-9458AF635DAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A23E460-F713-4230-B101-9458AF635DAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A23E460-F713-4230-B101-9458AF635DAD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EE3FD11B-F28C-4176-8EF6-0C4319A0B309}
+	EndGlobalSection
+EndGlobal
