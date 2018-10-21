@@ -74,6 +74,7 @@
     <Compile Include="Configuration\SeriesConfigCollection.cs" />
     <Compile Include="Configuration\SeriesConfigElement.cs" />
     <Compile Include="Configuration\SeriesPlaceHolder.cs" />
+    <Compile Include="Configuration\SaveFile.cs" />
     <Compile Include="Configuration\SeriesWebSite.cs" />
     <Compile Include="Configuration\SeriesWebSiteLocation.cs" />
     <Compile Include="MainWindow.xaml.cs">

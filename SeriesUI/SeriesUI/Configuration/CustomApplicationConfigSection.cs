@@ -23,5 +23,8 @@ namespace SeriesUI.Configuration
         [ConfigurationProperty("SeriesPlaceHolder")]
         public SeriesPlaceHolder SeriesPlaceHolder => base["SeriesPlaceHolder"] as SeriesPlaceHolder;
 
+        [ConfigurationProperty("SaveFile")]
+        public SaveFile SaveFile => base["SaveFile"] as SaveFile;
+
     }
 }

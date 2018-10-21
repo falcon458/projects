@@ -14,8 +14,6 @@ using SeriesUI.Configuration;
 // TODO:
 // DataBinding --> Separate UI from code
 // Refresh-merge (equals method?)
-// save-file location
-// add all remaining series
 // Why do we need to refresh in btnAllNlSubs_Click to update the grid?
 // Colors in grid & labels
 // Ask when outstanding unsaved changes
@@ -177,7 +175,8 @@ namespace SeriesUI
         {
             // Save application
             IFormatter formatter = new BinaryFormatter();
-            var buffer = File.Create(@"C:\temp\series.txt");
+            var buffer = File.Create(AppDomain.CurrentDomain.BaseDirectory + configurationService.SaveFile.Name);
+
             formatter.Serialize(buffer, SeriesList);
             buffer.Close();
         }
@@ -188,7 +187,7 @@ namespace SeriesUI
             IFormatter formatter = new BinaryFormatter();
 
             // Create the stream that the serialized data will be buffered too.
-            var buffer = File.OpenRead(@"C:\temp\series.txt");
+            var buffer = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + configurationService.SaveFile.Name);
 
             // Invoke the Deserialize method.
             SeriesList = formatter.Deserialize(buffer) as List<Series>;

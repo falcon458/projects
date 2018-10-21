@@ -18,6 +18,8 @@
 
         SeriesPlaceHolder SeriesPlaceHolder { get; }
 
+        SaveFile SaveFile { get; }
+
         SeriesWebSiteLocation SeriesWebSiteLocation { get; }
     }
 }

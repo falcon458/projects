@@ -67,6 +67,8 @@ namespace SeriesUI.Configuration
 
         public SeriesPlaceHolder SeriesPlaceHolder => configSection?.SeriesPlaceHolder;
 
+        public SaveFile SaveFile => configSection?.SaveFile;
+
         public SeriesWebSiteLocation SeriesWebSiteLocation => configSection?.SeriesWebSiteLocation;
 
         #endregion
