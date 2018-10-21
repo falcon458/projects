@@ -145,6 +145,8 @@ namespace SeriesUI
             listBoxSeries.Items.Clear();
             listBoxSeries.Items.Refresh();
 
+            SeriesList = new List<Series>();
+
             try
             {
                 Cursor = Cursors.Wait;
@@ -162,6 +164,7 @@ namespace SeriesUI
 
                     series.GetDataFromWebsite();
                     listBoxSeries.Items.Add(series);
+                    SeriesList.Add(series);
                 }
             }
             finally
