@@ -12,13 +12,13 @@
                  Margin="25,70,0,0" VerticalAlignment="Top" Width="187"
                  SelectionChanged="listBoxSeries_SelectionChanged" />
         <Grid x:Name="grdSeasons" Height="40" Margin="229,25,10,0" VerticalAlignment="Top" />
-        <Button x:Name="btnSave" Content="Save" HorizontalAlignment="Left" Margin="85,494,0,0" VerticalAlignment="Top"
+        <Button x:Name="btnSave" Content="Save" HorizontalAlignment="Left" Margin="42,494,0,0" VerticalAlignment="Top"
                 Width="75" Click="btnSave_Click" />
-        <Button x:Name="btnRefresh" Content="Refresh" HorizontalAlignment="Left" Margin="85,444,0,0"
+        <Button x:Name="btnRefresh" Content="Refresh" HorizontalAlignment="Left" Margin="42,444,0,0"
                 VerticalAlignment="Top" Width="75" Click="btnRefresh_Click" />
-        <Button x:Name="btnReload" Content="Reload" HorizontalAlignment="Left" Margin="85,469,0,0"
+        <Button x:Name="btnReload" Content="Reload" HorizontalAlignment="Left" Margin="42,469,0,0"
                 VerticalAlignment="Top" Width="75" Click="btnReload_Click" />
-        <Button x:Name="btnDebug" Content="Debug" HorizontalAlignment="Left" Margin="85,538,0,0"
+        <Button x:Name="btnDebug" Content="Debug" HorizontalAlignment="Left" Margin="42,538,0,0"
                 VerticalAlignment="Top" Width="75" RenderTransformOrigin="-0.025,-0.338" Click="btnDebug_Click" />
         <DataGrid x:Name="grdEpisodes" Margin="229,70,10,10" AutoGenerateColumns="False" FontFamily="Verdana">
             <DataGrid.Columns>
@@ -57,8 +57,9 @@
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
-        <Button x:Name="btnAllNlSubs" Content="All NL" HorizontalAlignment="Left" Margin="179,444,0,0" VerticalAlignment="Top" Width="45" Click="btnAllNlSubs_Click"/>
-        <Button x:Name="btnAllEnSubs" Content="All EN" HorizontalAlignment="Left" Margin="179,469,0,0" VerticalAlignment="Top" Width="45" Click="btnAllEnSubs_Click"/>
+        <Button x:Name="btnAllNlSubs" Content="All NL" HorizontalAlignment="Left" Margin="147,469,0,0" VerticalAlignment="Top" Width="65" Click="btnAllNlSubs_Click" RenderTransformOrigin="0.533,-0.8"/>
+        <Button x:Name="btnAllEnSubs" Content="All EN" HorizontalAlignment="Left" Margin="147,494,0,0" VerticalAlignment="Top" Width="65" Click="btnAllEnSubs_Click"/>
+        <Button x:Name="btnAllDownloaded" Content="All Down" HorizontalAlignment="Left" Margin="147,444,0,0" VerticalAlignment="Top" Width="65" RenderTransformOrigin="0.533,-0.8" Click="btnAllDownloaded_Click"/>
 
     </Grid>
 </Window>

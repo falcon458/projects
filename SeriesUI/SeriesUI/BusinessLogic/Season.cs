@@ -21,5 +21,11 @@ namespace SeriesUI.BusinessLogic
             foreach (var episode in Episodes)
                 episode.SubTitles[sub] = true;
         }
+
+        public void SetAllEpisodesDownloaded()
+        {
+            foreach (var episode in Episodes)
+                episode.Downloaded = true;
+        }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -10,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using SeriesUI.BusinessLogic;
+using SeriesUI.Configuration;
 
 // TODO:
 // DataBinding --> Separate UI from code
@@ -17,6 +17,9 @@ using SeriesUI.BusinessLogic;
 // save-file location
 // add all remaining series
 // Why do we need to refresh in btnAllNlSubs_Click to update the grid?
+// Colors in grid & labels
+// Ask when outstanding unsaved changes
+// Databinding van Series, dan werkt Items.refresh tijdens serie-refresh
 
 namespace SeriesUI
 {
@@ -25,6 +28,8 @@ namespace SeriesUI
     /// </summary>
     public partial class MainWindow : Window
     {
+        private readonly ConfigurationService configurationService = new ConfigurationService();
+
         public MainWindow()
         {
             InitializeComponent();
@@ -45,9 +50,10 @@ namespace SeriesUI
                 UnMarkSeasonLabels();
 
                 label.Background =
-                    (Brush) new BrushConverter().ConvertFrom(ConfigurationManager.AppSettings["LabelActiveColor"]);
+                    (Brush) new BrushConverter().ConvertFrom(configurationService.LabelActiveColor);
 
-                if (listBoxSeries.SelectedItem is Series series && int.TryParse(label.Content.ToString(), out var season))
+                if (listBoxSeries.SelectedItem is Series series &&
+                    int.TryParse(label.Content.ToString(), out var season))
                     grdEpisodes.ItemsSource = series.Seasons[season - 1].Episodes;
             }
         }
@@ -66,8 +72,7 @@ namespace SeriesUI
                 if (item is Label && int.TryParse((item as Label).Content.ToString(), out var labelSeason) &&
                     labelSeason != ActiveSeason)
                     (item as Label).Background =
-                        (Brush) new BrushConverter().ConvertFrom(
-                            ConfigurationManager.AppSettings["LabelInActiveColor"]);
+                        (Brush) new BrushConverter().ConvertFrom(configurationService.LabelInActiveColor);
         }
 
         private void OnLabelMouseEnter(object sender, EventArgs e)
@@ -76,7 +81,7 @@ namespace SeriesUI
             if (sender is Label label && int.TryParse(label.Content.ToString(), out var labelSeason) &&
                 labelSeason != ActiveSeason)
                 label.Background =
-                    (Brush) new BrushConverter().ConvertFrom(ConfigurationManager.AppSettings["LabelActiveColor"]);
+                    (Brush) new BrushConverter().ConvertFrom(configurationService.LabelActiveColor);
         }
 
         private void OnLabelMouseLeave(object sender, EventArgs e)
@@ -85,7 +90,7 @@ namespace SeriesUI
             if (sender is Label label && int.TryParse(label.Content.ToString(), out var labelSeason) &&
                 labelSeason != ActiveSeason)
                 label.Background =
-                    (Brush) new BrushConverter().ConvertFrom(ConfigurationManager.AppSettings["LabelInActiveColor"]);
+                    (Brush) new BrushConverter().ConvertFrom(configurationService.LabelInActiveColor);
         }
 
         private void listBoxSeries_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -109,18 +114,16 @@ namespace SeriesUI
 
         private Label GetNewLabel(int sequence)
         {
-            var labelWidth = double.Parse(ConfigurationManager.AppSettings["LabelWidth"]);
-            var labelHeight = double.Parse(ConfigurationManager.AppSettings["labelHeight"]);
-            var labelSpacing = double.Parse(ConfigurationManager.AppSettings["labelSpacing"]);
+            var labelWidth = configurationService.LabelWidth;
+            var labelHeight = configurationService.LabelHeight;
+            var labelSpacing = configurationService.LabelSpacing;
 
             var label = new Label
             {
                 Width = labelWidth,
                 Height = labelHeight,
                 Content = sequence + 1,
-                Background =
-                    (Brush) new BrushConverter().ConvertFrom(
-                        ConfigurationManager.AppSettings["LabelInActiveColor"]),
+                Background = (Brush) new BrushConverter().ConvertFrom(configurationService.LabelInActiveColor),
                 BorderThickness = new Thickness(0),
                 BorderBrush = Brushes.Black,
                 HorizontalContentAlignment = HorizontalAlignment.Center,
@@ -145,27 +148,19 @@ namespace SeriesUI
             try
             {
                 Cursor = Cursors.Wait;
+                var placeHolder = configurationService.SeriesPlaceHolder.text;
 
-                SeriesList = new List<Series>
+                foreach (SeriesConfigElement newSeries in configurationService.SeriesConfigCollection)
                 {
-                    new Series
+                    var series = new Series
                     {
-                        Name = "The Big Bang Theory",
-                        WebSite = "https://www.seriesfeed.com",
-                        LocalUrl = "/series/the-big-bang-theory/episodes/season"
-                    },
-                    new Series
-                    {
-                        Name = "Modern Family",
-                        WebSite = "https://www.seriesfeed.com",
-                        LocalUrl = "/series/modern-family/episodes/season"
-                    }
-                };
+                        Name = newSeries.Name,
+                        WebSite = configurationService.SeriesWebSite.url,
+                        LocalUrl = configurationService.SeriesWebSiteLocation.url.Replace(placeHolder,
+                            newSeries.Name.Replace(" ", "-").ToLower())
+                    };
 
-                foreach (var series in SeriesList)
-                {
                     series.GetDataFromWebsite();
-
                     listBoxSeries.Items.Add(series);
                 }
             }
@@ -206,12 +201,6 @@ namespace SeriesUI
                     listBoxSeries.Items.Add(series);
         }
 
-        private void btnDebug_Click(object sender, RoutedEventArgs e)
-        {
-            SeriesList[0].Seasons[0].Episodes[2].Downloaded = true;
-            grdEpisodes.ItemsSource = SeriesList[0].Seasons[0].Episodes;
-        }
-
         /// <summary>
         ///     Set NL subs on for this season
         /// </summary>
@@ -236,6 +225,51 @@ namespace SeriesUI
                 ((Series) listBoxSeries.SelectedItems[0])?.Seasons[ActiveSeason - 1].SetAllSubs(Episode.SubTitle.EN);
 
             grdEpisodes.Items.Refresh();
+        }
+
+        private void btnAllDownloaded_Click(object sender, RoutedEventArgs e)
+        {
+            if (listBoxSeries.SelectedItems.Count > 0)
+                ((Series) listBoxSeries.SelectedItems[0])?.Seasons[ActiveSeason - 1].SetAllEpisodesDownloaded();
+
+            grdEpisodes.Items.Refresh();
+        }
+
+        private void btnDebug_Click(object sender, RoutedEventArgs e)
+        {
+            //var series = configurationService.SeriesConfigCollection;
+
+            //MessageBox.Show((series[0] as SeriesConfigElement).Name);
+
+            //var tst = configurationService.SeriesConfigCollection;
+
+            //foreach (var el in tst) MessageBox.Show(el.Name);
+            listBoxSeries.Items.Clear();
+            listBoxSeries.Items.Refresh();
+
+            try
+            {
+                Cursor = Cursors.Wait;
+                var placeHolder = configurationService.SeriesPlaceHolder.text;
+
+                foreach (SeriesConfigElement newSeries in configurationService.SeriesConfigCollection)
+                {
+                    var series = new Series
+                    {
+                        Name = newSeries.Name,
+                        WebSite = configurationService.SeriesWebSite.url,
+                        LocalUrl = configurationService.SeriesWebSiteLocation.url.Replace(placeHolder,
+                            newSeries.Name.Replace(" ", "-").ToLower())
+                    };
+
+                    series.GetDataFromWebsite();
+                    listBoxSeries.Items.Add(series);
+                }
+            }
+            finally
+            {
+                Cursor = Cursors.Arrow;
+            }
         }
     }
 }
