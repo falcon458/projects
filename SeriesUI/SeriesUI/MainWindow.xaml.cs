@@ -11,10 +11,12 @@ using System.Windows.Input;
 using System.Windows.Media;
 using SeriesUI.BusinessLogic;
 
-// Todo:
+// TODO:
 // DataBinding --> Separate UI from code
-// Serialization
-
+// Refresh-merge (equals method?)
+// save-file location
+// add all remaining series
+// Why do we need to refresh in btnAllNlSubs_Click to update the grid?
 
 namespace SeriesUI
 {
@@ -28,6 +30,7 @@ namespace SeriesUI
             InitializeComponent();
         }
 
+        // The current season (1-based)
         private int ActiveSeason { get; set; }
 
         private List<Series> SeriesList { get; set; }
@@ -44,8 +47,7 @@ namespace SeriesUI
                 label.Background =
                     (Brush) new BrushConverter().ConvertFrom(ConfigurationManager.AppSettings["LabelActiveColor"]);
 
-                var series = listBoxSeries.SelectedItem as Series;
-                if (int.TryParse(label.Content.ToString(), out var season))
+                if (listBoxSeries.SelectedItem is Series series && int.TryParse(label.Content.ToString(), out var season))
                     grdEpisodes.ItemsSource = series.Seasons[season - 1].Episodes;
             }
         }
@@ -88,10 +90,6 @@ namespace SeriesUI
 
         private void listBoxSeries_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var labelWidth = double.Parse(ConfigurationManager.AppSettings["LabelWidth"]);
-            var labelHeight = double.Parse(ConfigurationManager.AppSettings["labelHeight"]);
-            var labelSpacing = double.Parse(ConfigurationManager.AppSettings["labelSpacing"]);
-
             DeleteSeasonLabels();
             grdEpisodes.ItemsSource = null;
 
@@ -99,32 +97,44 @@ namespace SeriesUI
 
             for (var i = 0; i < series?.Seasons.Count; i++)
             {
-                var lbl = new Label
-                {
-                    Width = labelWidth,
-                    Height = labelHeight,
-                    Content = i + 1,
-                    Background =
-                        (Brush) new BrushConverter().ConvertFrom(
-                            ConfigurationManager.AppSettings["LabelInActiveColor"]),
-                    BorderThickness = new Thickness(0),
-                    BorderBrush = Brushes.Black,
-                    HorizontalContentAlignment = HorizontalAlignment.Center,
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalContentAlignment = VerticalAlignment.Center,
-                    Margin = new Thickness(i * (labelWidth + 1) + labelSpacing, 5, 0, 0),
-                    Tag = "temporary"
-                };
-
-                lbl.MouseEnter += OnLabelMouseEnter;
-                lbl.MouseLeave += OnLabelMouseLeave;
-                lbl.MouseLeftButtonDown += OnLabelMouseClick;
+                var lbl = GetNewLabel(i);
 
                 grdSeasons.Children.Add(lbl);
             }
 
             // Select last season
-            OnLabelMouseClick(grdSeasons.Children[grdSeasons.Children.Count - 1], new EventArgs());
+            if (grdSeasons.Children.Count > 0)
+                OnLabelMouseClick(grdSeasons.Children[grdSeasons.Children.Count - 1], new EventArgs());
+        }
+
+        private Label GetNewLabel(int sequence)
+        {
+            var labelWidth = double.Parse(ConfigurationManager.AppSettings["LabelWidth"]);
+            var labelHeight = double.Parse(ConfigurationManager.AppSettings["labelHeight"]);
+            var labelSpacing = double.Parse(ConfigurationManager.AppSettings["labelSpacing"]);
+
+            var label = new Label
+            {
+                Width = labelWidth,
+                Height = labelHeight,
+                Content = sequence + 1,
+                Background =
+                    (Brush) new BrushConverter().ConvertFrom(
+                        ConfigurationManager.AppSettings["LabelInActiveColor"]),
+                BorderThickness = new Thickness(0),
+                BorderBrush = Brushes.Black,
+                HorizontalContentAlignment = HorizontalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalContentAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(sequence * (labelWidth + 1) + labelSpacing, 5, 0, 0),
+                Tag = "temporary"
+            };
+
+            label.MouseEnter += OnLabelMouseEnter;
+            label.MouseLeave += OnLabelMouseLeave;
+            label.MouseLeftButtonDown += OnLabelMouseClick;
+
+            return label;
         }
 
         private void btnRefresh_Click(object sender, RoutedEventArgs e)
@@ -200,6 +210,32 @@ namespace SeriesUI
         {
             SeriesList[0].Seasons[0].Episodes[2].Downloaded = true;
             grdEpisodes.ItemsSource = SeriesList[0].Seasons[0].Episodes;
+        }
+
+        /// <summary>
+        ///     Set NL subs on for this season
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnAllNlSubs_Click(object sender, RoutedEventArgs e)
+        {
+            if (listBoxSeries.SelectedItems.Count > 0)
+                ((Series) listBoxSeries.SelectedItems[0])?.Seasons[ActiveSeason - 1].SetAllSubs(Episode.SubTitle.NL);
+
+            grdEpisodes.Items.Refresh();
+        }
+
+        /// <summary>
+        ///     Set EN subs on for this season
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnAllEnSubs_Click(object sender, RoutedEventArgs e)
+        {
+            if (listBoxSeries.SelectedItems.Count > 0)
+                ((Series) listBoxSeries.SelectedItems[0])?.Seasons[ActiveSeason - 1].SetAllSubs(Episode.SubTitle.EN);
+
+            grdEpisodes.Items.Refresh();
         }
     }
 }

@@ -15,5 +15,11 @@ namespace SeriesUI.BusinessLogic
         public int Sequence { get; }
 
         public List<Episode> Episodes { get; set; }
+
+        public void SetAllSubs(Episode.SubTitle sub)
+        {
+            foreach (var episode in Episodes)
+                episode.SubTitles[sub] = true;
+        }
     }
 }

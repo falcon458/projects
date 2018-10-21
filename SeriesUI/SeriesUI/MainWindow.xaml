@@ -6,13 +6,12 @@
         xmlns:local="clr-namespace:SeriesUI"
         mc:Ignorable="d"
         Name="mainWindow"
-        Title="Series" Height="589.767" Width="844.225">
+        Title="Series" Height="589.767" Width="1007.225">
     <Grid Margin="0,-24,0,0">
         <ListBox x:Name="listBoxSeries" DisplayMemberPath="Name" HorizontalAlignment="Left" Height="353"
                  Margin="25,70,0,0" VerticalAlignment="Top" Width="187"
                  SelectionChanged="listBoxSeries_SelectionChanged" />
-        <Grid x:Name="grdSeasons" HorizontalAlignment="Left" Height="40" Margin="229,25,0,0" VerticalAlignment="Top"
-              Width="553" />
+        <Grid x:Name="grdSeasons" Height="40" Margin="229,25,10,0" VerticalAlignment="Top" />
         <Button x:Name="btnSave" Content="Save" HorizontalAlignment="Left" Margin="85,494,0,0" VerticalAlignment="Top"
                 Width="75" Click="btnSave_Click" />
         <Button x:Name="btnRefresh" Content="Refresh" HorizontalAlignment="Left" Margin="85,444,0,0"
@@ -36,8 +35,30 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+                <DataGridTemplateColumn MinWidth="20" Header="NL">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center"
+                                          IsChecked="{Binding SubTitles[0], Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn MinWidth="20" Header="EN">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center"
+                                          IsChecked="{Binding SubTitles[1], Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
+        <Button x:Name="btnAllNlSubs" Content="All NL" HorizontalAlignment="Left" Margin="179,444,0,0" VerticalAlignment="Top" Width="45" Click="btnAllNlSubs_Click"/>
+        <Button x:Name="btnAllEnSubs" Content="All EN" HorizontalAlignment="Left" Margin="179,469,0,0" VerticalAlignment="Top" Width="45" Click="btnAllEnSubs_Click"/>
 
     </Grid>
 </Window>

@@ -6,12 +6,20 @@ namespace SeriesUI.BusinessLogic
     [Serializable]
     internal class Episode
     {
-        public Episode()
+        public enum SubTitle
         {
-            SubTitles = new List<string>();
+            NL,
+            EN
         }
 
-        public Episode(string title)
+        public Episode()
+        {
+            SubTitles = new Dictionary<SubTitle, bool>();
+            SubTitles[SubTitle.NL] = false;
+            SubTitles[SubTitle.EN] = false;
+        }
+
+        public Episode(string title) : this()
         {
             Title = title;
         }
@@ -22,6 +30,6 @@ namespace SeriesUI.BusinessLogic
 
         public bool Downloaded { get; set; }
 
-        public List<string> SubTitles { get; set; }
+        public Dictionary<SubTitle, bool> SubTitles { get; set; }
     }
 }
