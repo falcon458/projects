@@ -14,9 +14,9 @@ using SeriesUI.Configuration;
 // TODO:
 // DataBinding --> Separate UI from code
 // Refresh-merge (equals method?)
-// Why do we need to refresh in btnAllNlSubs_Click to update the grid?
+// Why do we need to refresh in btnAllNlSubs_Click (and others) to update the grid?
 // Colors in grid & labels
-// Ask when outstanding unsaved changes
+// Ask when outstanding unsaved changes (INotifyPropertyChanged)
 // Databinding van Series, dan werkt Items.refresh tijdens serie-refresh
 
 namespace SeriesUI
@@ -140,10 +140,8 @@ namespace SeriesUI
 
         private void btnRefresh_Click(object sender, RoutedEventArgs e)
         {
-            listBoxSeries.Items.Clear();
-            listBoxSeries.Items.Refresh();
-
             SeriesList = new List<Series>();
+            listBoxSeries.ItemsSource = SeriesList;
 
             try
             {
@@ -161,7 +159,6 @@ namespace SeriesUI
                     };
 
                     series.GetDataFromWebsite();
-                    listBoxSeries.Items.Add(series);
                     SeriesList.Add(series);
                 }
             }
@@ -191,16 +188,10 @@ namespace SeriesUI
 
             // Invoke the Deserialize method.
             SeriesList = formatter.Deserialize(buffer) as List<Series>;
+            listBoxSeries.ItemsSource = SeriesList;
 
             // Close the stream.
             buffer.Close();
-
-            listBoxSeries.Items.Clear();
-            listBoxSeries.Items.Refresh();
-
-            if (SeriesList != null)
-                foreach (var series in SeriesList)
-                    listBoxSeries.Items.Add(series);
         }
 
         /// <summary>
@@ -246,8 +237,6 @@ namespace SeriesUI
             //var tst = configurationService.SeriesConfigCollection;
 
             //foreach (var el in tst) MessageBox.Show(el.Name);
-            listBoxSeries.Items.Clear();
-            listBoxSeries.Items.Refresh();
 
             try
             {
@@ -265,7 +254,6 @@ namespace SeriesUI
                     };
 
                     series.GetDataFromWebsite();
-                    listBoxSeries.Items.Add(series);
                 }
             }
             finally
