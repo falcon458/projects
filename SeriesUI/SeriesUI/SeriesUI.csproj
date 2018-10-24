@@ -67,6 +67,7 @@
     <Compile Include="BusinessLogic\Episode.cs" />
     <Compile Include="BusinessLogic\Season.cs" />
     <Compile Include="BusinessLogic\Series.cs" />
+    <Compile Include="BusinessLogic\SeriesList.cs" />
     <Compile Include="BusinessLogic\WebPage.cs" />
     <Compile Include="Configuration\ConfigurationService.cs" />
     <Compile Include="Configuration\CustomApplicationConfigSection.cs" />
