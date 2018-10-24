@@ -1,23 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using SeriesUI.BusinessLogic;
 using SeriesUI.Configuration;
 
 // TODO:
-// DataBinding --> Separate UI from code
 // Refresh-merge (equals method?)
 // Why do we need to refresh in btnAllNlSubs_Click (and others) to update the grid?
 // Colors in grid & labels
 // Ask when outstanding unsaved changes (INotifyPropertyChanged)
 // Databinding van Series, dan werkt Items.refresh tijdens serie-refresh
+// Header-click ipv all-buttons
+// Log to file
 
 namespace SeriesUI
 {
@@ -26,17 +24,22 @@ namespace SeriesUI
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly ConfigurationService configurationService = new ConfigurationService();
+        private readonly ConfigurationService configurationService;
+        private readonly SeriesList SeriesList;
 
         public MainWindow()
         {
             InitializeComponent();
+
+            configurationService = new ConfigurationService();
+
+            SeriesList = new SeriesList(configurationService);
+
+            listBoxSeries.ItemsSource = SeriesList.Series;
         }
 
         // The current season (1-based)
         private int ActiveSeason { get; set; }
-
-        private List<Series> SeriesList { get; set; }
 
         private void OnLabelMouseClick(object sender, EventArgs e)
         {
@@ -140,27 +143,13 @@ namespace SeriesUI
 
         private void btnRefresh_Click(object sender, RoutedEventArgs e)
         {
-            SeriesList = new List<Series>();
-            listBoxSeries.ItemsSource = SeriesList;
-
             try
             {
                 Cursor = Cursors.Wait;
-                var placeHolder = configurationService.SeriesPlaceHolder.text;
 
-                foreach (SeriesConfigElement newSeries in configurationService.SeriesConfigCollection)
-                {
-                    var series = new Series
-                    {
-                        Name = newSeries.Name,
-                        WebSite = configurationService.SeriesWebSite.url,
-                        LocalUrl = configurationService.SeriesWebSiteLocation.url.Replace(placeHolder,
-                            newSeries.Name.Replace(" ", "-").ToLower())
-                    };
+                SeriesList.Refresh();
 
-                    series.GetDataFromWebsite();
-                    SeriesList.Add(series);
-                }
+                listBoxSeries.Items.Refresh();
             }
             finally
             {
@@ -170,96 +159,48 @@ namespace SeriesUI
 
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
-            // Save application
-            IFormatter formatter = new BinaryFormatter();
-            var buffer = File.Create(AppDomain.CurrentDomain.BaseDirectory + configurationService.SaveFile.Name);
-
-            formatter.Serialize(buffer, SeriesList);
-            buffer.Close();
+            SeriesList.SaveToDisk();
         }
 
         private void btnReload_Click(object sender, RoutedEventArgs e)
         {
-            // Create the formatter to serialize the object.
-            IFormatter formatter = new BinaryFormatter();
-
-            // Create the stream that the serialized data will be buffered too.
-            var buffer = File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + configurationService.SaveFile.Name);
-
-            // Invoke the Deserialize method.
-            SeriesList = formatter.Deserialize(buffer) as List<Series>;
-            listBoxSeries.ItemsSource = SeriesList;
-
-            // Close the stream.
-            buffer.Close();
+            SeriesList.ReloadFromDisk();
+            listBoxSeries.ItemsSource = SeriesList.Series;
         }
 
-        /// <summary>
-        ///     Set NL subs on for this season
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void btnAllNlSubs_Click(object sender, RoutedEventArgs e)
+        private void GrdEpisodesClick(object sender, RoutedEventArgs e)
         {
-            if (listBoxSeries.SelectedItems.Count > 0)
-                ((Series) listBoxSeries.SelectedItems[0])?.Seasons[ActiveSeason - 1].SetAllSubs(Episode.SubTitle.NL);
+            var header = (sender as DataGridColumnHeader)?.Content.ToString();
 
-            grdEpisodes.Items.Refresh();
-        }
-
-        /// <summary>
-        ///     Set EN subs on for this season
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void btnAllEnSubs_Click(object sender, RoutedEventArgs e)
-        {
-            if (listBoxSeries.SelectedItems.Count > 0)
-                ((Series) listBoxSeries.SelectedItems[0])?.Seasons[ActiveSeason - 1].SetAllSubs(Episode.SubTitle.EN);
-
-            grdEpisodes.Items.Refresh();
-        }
-
-        private void btnAllDownloaded_Click(object sender, RoutedEventArgs e)
-        {
-            if (listBoxSeries.SelectedItems.Count > 0)
-                ((Series) listBoxSeries.SelectedItems[0])?.Seasons[ActiveSeason - 1].SetAllEpisodesDownloaded();
+            switch (header?.ToUpper())
+            {
+                case "NL":
+                    ((Series) listBoxSeries.SelectedItems[0])?.Seasons[ActiveSeason - 1]
+                        .ToggleAllSubs(Episode.SubTitle.NL);
+                    break;
+                case "EN":
+                    ((Series) listBoxSeries.SelectedItems[0])?.Seasons[ActiveSeason - 1]
+                        .ToggleAllSubs(Episode.SubTitle.EN);
+                    break;
+                case "DOWNLOADED":
+                    ((Series) listBoxSeries.SelectedItems[0])?.Seasons[ActiveSeason - 1].ToggleDownloaded();
+                    break;
+                case "DATE":
+                case "TITLE":
+                    break;
+                default:
+                    Common.Log($"ERROR: Non-coded column header: {header}");
+                    break;
+            }
 
             grdEpisodes.Items.Refresh();
         }
 
         private void btnDebug_Click(object sender, RoutedEventArgs e)
         {
-            //var series = configurationService.SeriesConfigCollection;
+            var result = ((Series) listBoxSeries.SelectedItems[0]).Seasons[ActiveSeason - 1].Completeness;
 
-            //MessageBox.Show((series[0] as SeriesConfigElement).Name);
-
-            //var tst = configurationService.SeriesConfigCollection;
-
-            //foreach (var el in tst) MessageBox.Show(el.Name);
-
-            try
-            {
-                Cursor = Cursors.Wait;
-                var placeHolder = configurationService.SeriesPlaceHolder.text;
-
-                foreach (SeriesConfigElement newSeries in configurationService.SeriesConfigCollection)
-                {
-                    var series = new Series
-                    {
-                        Name = newSeries.Name,
-                        WebSite = configurationService.SeriesWebSite.url,
-                        LocalUrl = configurationService.SeriesWebSiteLocation.url.Replace(placeHolder,
-                            newSeries.Name.Replace(" ", "-").ToLower())
-                    };
-
-                    series.GetDataFromWebsite();
-                }
-            }
-            finally
-            {
-                Cursor = Cursors.Arrow;
-            }
+            MessageBox.Show(result.ToString());
         }
     }
 }

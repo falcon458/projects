@@ -21,9 +21,14 @@
         <Button x:Name="btnDebug" Content="Debug" HorizontalAlignment="Left" Margin="42,538,0,0"
                 VerticalAlignment="Top" Width="75" RenderTransformOrigin="-0.025,-0.338" Click="btnDebug_Click" />
         <DataGrid x:Name="grdEpisodes" Margin="229,70,10,10" AutoGenerateColumns="False" FontFamily="Verdana">
+            <DataGrid.ColumnHeaderStyle>
+                <Style TargetType="DataGridColumnHeader">
+                    <EventSetter Event="Click" Handler="GrdEpisodesClick" />
+                </Style>
+            </DataGrid.ColumnHeaderStyle>
             <DataGrid.Columns>
-                <DataGridTextColumn Binding="{Binding AirDate, StringFormat=d, ConverterCulture=en-GB}" ClipboardContentBinding="{x:Null}" Header="Date"/>
-                <DataGridTextColumn Binding="{Binding Title}" ClipboardContentBinding="{x:Null}" Header="Title"/>
+                <DataGridTextColumn Binding="{Binding AirDate, StringFormat=d, ConverterCulture=en-GB}" ClipboardContentBinding="{x:Null}" Header="Date" CanUserSort="False"/>
+                <DataGridTextColumn Binding="{Binding Title}" ClipboardContentBinding="{x:Null}" Header="Title" CanUserSort="False"/>
                 <!--From https://stackoverflow.com/questions/3833536/how-to-perform-single-click-checkbox-selection-in-wpf-datagrid-->
                 <DataGridTemplateColumn MinWidth="20" Header="Downloaded">
                     <DataGridTemplateColumn.CellTemplate>
@@ -57,9 +62,5 @@
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
-        <Button x:Name="btnAllNlSubs" Content="All NL" HorizontalAlignment="Left" Margin="147,469,0,0" VerticalAlignment="Top" Width="65" Click="btnAllNlSubs_Click" RenderTransformOrigin="0.533,-0.8"/>
-        <Button x:Name="btnAllEnSubs" Content="All EN" HorizontalAlignment="Left" Margin="147,494,0,0" VerticalAlignment="Top" Width="65" Click="btnAllEnSubs_Click"/>
-        <Button x:Name="btnAllDownloaded" Content="All Down" HorizontalAlignment="Left" Margin="147,444,0,0" VerticalAlignment="Top" Width="65" RenderTransformOrigin="0.533,-0.8" Click="btnAllDownloaded_Click"/>
-
     </Grid>
 </Window>
