@@ -1,6 +1,6 @@
 ﻿namespace SeriesUI.Configuration
 {
-    internal interface IConfigurationService
+    public interface IConfigurationService
     {
         string InActiveCompleteColor { get; }
         string ActiveCompleteColor { get; }
@@ -13,6 +13,9 @@
 
         string InActiveNotDownloadedColor { get; }
         string ActiveNotDownloadedColor { get; }
+
+        string InActiveNotApplicableColor { get; }
+        string ActiveNotApplicableColor { get; }
 
         int LabelWidth { get; }
 

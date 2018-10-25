@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -8,15 +7,17 @@ using System.Windows.Input;
 using System.Windows.Media;
 using SeriesUI.BusinessLogic;
 using SeriesUI.Configuration;
-using SeriesUI.Windows;
 
 // TODO: Andere kleuren? Omranden?
 // Refresh-merge (equals method?)
 // Why do we need to refresh in btnAllNlSubs_Click (and others) to update the grid?
 // Colors in grid
-// Ask when outstanding unsaved changes (INotifyPropertyChanged)
+// INotifyPropertyChanged:
+//     - Ask when outstanding unsaved changes
+//     - Zorg dat wijzigingen direct nieuwe kleuren geven.
 // Log to file
 // Better Call Saul - S04E06 - PiÃ±ata
+// ColorConfiguration class heeft 2 constructors die beiden worden gebruikt, we hebben dus 2 instances. Kijk of we met 1 af kunnen
 
 namespace SeriesUI
 {
@@ -25,7 +26,7 @@ namespace SeriesUI
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly Dictionary<int, Brush> colorPalette;
+        private readonly ColorConfiguration colorConfiguration;
         private readonly IConfigurationService configurationService;
         private readonly SeriesList seriesList;
 
@@ -35,9 +36,7 @@ namespace SeriesUI
 
             configurationService = new ConfigurationService();
 
-            colorPalette = new Dictionary<int, Brush>();
-
-            MyInitializeComponent();
+            colorConfiguration = new ColorConfiguration(configurationService);
 
             seriesList = new SeriesList(configurationService);
 
@@ -46,30 +45,6 @@ namespace SeriesUI
 
         // The current season (1-based)
         private int ActiveSeason { get; set; }
-
-        private void MyInitializeComponent()
-        {
-            // Initialize the Color Palette
-            colorPalette[new ColorPaletteKey(CompletenessState.Complete, true).GetHashCode()] =
-                (Brush) new BrushConverter().ConvertFrom(configurationService.ActiveCompleteColor);
-            colorPalette[new ColorPaletteKey(CompletenessState.Complete, false).GetHashCode()] =
-                (Brush) new BrushConverter().ConvertFrom(configurationService.InActiveCompleteColor);
-
-            colorPalette[new ColorPaletteKey(CompletenessState.NotSubbedNl, true).GetHashCode()] =
-                (Brush) new BrushConverter().ConvertFrom(configurationService.ActiveNotSubbedNlColor);
-            colorPalette[new ColorPaletteKey(CompletenessState.NotSubbedNl, false).GetHashCode()] =
-                (Brush) new BrushConverter().ConvertFrom(configurationService.InActiveNotSubbedNlColor);
-
-            colorPalette[new ColorPaletteKey(CompletenessState.NotSubbed, true).GetHashCode()] =
-                (Brush) new BrushConverter().ConvertFrom(configurationService.ActiveNotSubbedColor);
-            colorPalette[new ColorPaletteKey(CompletenessState.NotSubbed, false).GetHashCode()] =
-                (Brush) new BrushConverter().ConvertFrom(configurationService.InActiveNotSubbedColor);
-
-            colorPalette[new ColorPaletteKey(CompletenessState.NotDownloaded, true).GetHashCode()] =
-                (Brush) new BrushConverter().ConvertFrom(configurationService.ActiveNotDownloadedColor);
-            colorPalette[new ColorPaletteKey(CompletenessState.NotDownloaded, false).GetHashCode()] =
-                (Brush) new BrushConverter().ConvertFrom(configurationService.InActiveNotDownloadedColor);
-        }
 
         private void OnLabelMouseClick(object sender, EventArgs e)
         {
@@ -100,7 +75,7 @@ namespace SeriesUI
                 var key = new ColorPaletteKey(series.Seasons[season].Completeness, active)
                     .GetHashCode();
 
-                result = colorPalette[key];
+                result = colorConfiguration.colorPalette[key];
             }
 
             return result;
@@ -241,12 +216,7 @@ namespace SeriesUI
 
         private void btnDebug_Click(object sender, RoutedEventArgs e)
         {
-            var series = (Series) listBoxSeries.SelectedItems[0];
-
-            var seasonCompleteness = series.Seasons[ActiveSeason - 1].Episodes
-                .Where(c => c.Completeness > CompletenessState.NotApplicable).Select(x => x.Completeness).Max();
-
-            MessageBox.Show(seasonCompleteness.ToString());
+            //grdEpisodes.
         }
     }
 }

@@ -1,18 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SeriesUI.Common;
 
 namespace SeriesUI.BusinessLogic
 {
-    public enum CompletenessState
-    {
-        NotApplicable,
-        Complete,
-        NotSubbedNl,
-        NotSubbed,
-        NotDownloaded
-    }
-
     [Serializable]
     public class Season
     {

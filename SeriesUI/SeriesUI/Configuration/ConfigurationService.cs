@@ -40,6 +40,10 @@ namespace SeriesUI.Configuration
         public string InActiveNotDownloadedColor => appSettings["InActiveNotDownloadedColor"];
         public string ActiveNotDownloadedColor => appSettings["ActiveNotDownloadedColor"];
 
+        public string InActiveNotApplicableColor => appSettings["InActiveNotApplicableColor"];
+        public string ActiveNotApplicableColor => appSettings["ActiveNotApplicableColor"];
+
+
         public int LabelWidth
         {
             get

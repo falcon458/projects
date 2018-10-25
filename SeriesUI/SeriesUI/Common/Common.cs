@@ -4,6 +4,7 @@ namespace SeriesUI.Common
 {
     public enum CompletenessState
     {
+        NotApplicable,
         Complete,
         NotSubbedNl,
         NotSubbed,
