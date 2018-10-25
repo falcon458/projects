@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -7,15 +8,15 @@ using System.Windows.Input;
 using System.Windows.Media;
 using SeriesUI.BusinessLogic;
 using SeriesUI.Configuration;
+using SeriesUI.Windows;
 
-// TODO:
+// TODO: Andere kleuren? Omranden?
 // Refresh-merge (equals method?)
 // Why do we need to refresh in btnAllNlSubs_Click (and others) to update the grid?
-// Colors in grid & labels
+// Colors in grid
 // Ask when outstanding unsaved changes (INotifyPropertyChanged)
-// Databinding van Series, dan werkt Items.refresh tijdens serie-refresh
-// Header-click ipv all-buttons
 // Log to file
+// Better Call Saul - S04E06 - PiÃ±ata
 
 namespace SeriesUI
 {
@@ -24,8 +25,9 @@ namespace SeriesUI
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly ConfigurationService configurationService;
-        private readonly SeriesList SeriesList;
+        private readonly Dictionary<int, Brush> colorPalette;
+        private readonly IConfigurationService configurationService;
+        private readonly SeriesList seriesList;
 
         public MainWindow()
         {
@@ -33,30 +35,75 @@ namespace SeriesUI
 
             configurationService = new ConfigurationService();
 
-            SeriesList = new SeriesList(configurationService);
+            colorPalette = new Dictionary<int, Brush>();
 
-            listBoxSeries.ItemsSource = SeriesList.Series;
+            MyInitializeComponent();
+
+            seriesList = new SeriesList(configurationService);
+
+            listBoxSeries.ItemsSource = seriesList.Series;
         }
 
         // The current season (1-based)
         private int ActiveSeason { get; set; }
+
+        private void MyInitializeComponent()
+        {
+            // Initialize the Color Palette
+            colorPalette[new ColorPaletteKey(CompletenessState.Complete, true).GetHashCode()] =
+                (Brush) new BrushConverter().ConvertFrom(configurationService.ActiveCompleteColor);
+            colorPalette[new ColorPaletteKey(CompletenessState.Complete, false).GetHashCode()] =
+                (Brush) new BrushConverter().ConvertFrom(configurationService.InActiveCompleteColor);
+
+            colorPalette[new ColorPaletteKey(CompletenessState.NotSubbedNl, true).GetHashCode()] =
+                (Brush) new BrushConverter().ConvertFrom(configurationService.ActiveNotSubbedNlColor);
+            colorPalette[new ColorPaletteKey(CompletenessState.NotSubbedNl, false).GetHashCode()] =
+                (Brush) new BrushConverter().ConvertFrom(configurationService.InActiveNotSubbedNlColor);
+
+            colorPalette[new ColorPaletteKey(CompletenessState.NotSubbed, true).GetHashCode()] =
+                (Brush) new BrushConverter().ConvertFrom(configurationService.ActiveNotSubbedColor);
+            colorPalette[new ColorPaletteKey(CompletenessState.NotSubbed, false).GetHashCode()] =
+                (Brush) new BrushConverter().ConvertFrom(configurationService.InActiveNotSubbedColor);
+
+            colorPalette[new ColorPaletteKey(CompletenessState.NotDownloaded, true).GetHashCode()] =
+                (Brush) new BrushConverter().ConvertFrom(configurationService.ActiveNotDownloadedColor);
+            colorPalette[new ColorPaletteKey(CompletenessState.NotDownloaded, false).GetHashCode()] =
+                (Brush) new BrushConverter().ConvertFrom(configurationService.InActiveNotDownloadedColor);
+        }
 
         private void OnLabelMouseClick(object sender, EventArgs e)
         {
             // This construct checks for null value
             if (sender is Label label && int.TryParse(label.Content.ToString(), out var newLabelSeason))
             {
+                // Store the new active season
                 ActiveSeason = newLabelSeason;
 
+                // Un-mark all labels
                 UnMarkSeasonLabels();
 
-                label.Background =
-                    (Brush) new BrushConverter().ConvertFrom(configurationService.LabelActiveColor);
+                // Set the background for this label
+                label.Background = LabelBackGround(ActiveSeason - 1, true);
 
-                if (listBoxSeries.SelectedItem is Series series &&
-                    int.TryParse(label.Content.ToString(), out var season))
-                    grdEpisodes.ItemsSource = series.Seasons[season - 1].Episodes;
+                // Show the episodes for this label's season
+                if (listBoxSeries.SelectedItem is Series series)
+                    grdEpisodes.ItemsSource = series.Seasons[ActiveSeason - 1].Episodes;
             }
+        }
+
+        private Brush LabelBackGround(int season, bool active)
+        {
+            Brush result = null;
+
+            if (listBoxSeries.SelectedItem is Series series)
+            {
+                var key = new ColorPaletteKey(series.Seasons[season].Completeness, active)
+                    .GetHashCode();
+
+                result = colorPalette[key];
+            }
+
+            return result;
         }
 
         private void DeleteSeasonLabels()
@@ -70,28 +117,24 @@ namespace SeriesUI
         private void UnMarkSeasonLabels()
         {
             foreach (var item in grdSeasons.Children)
-                if (item is Label && int.TryParse((item as Label).Content.ToString(), out var labelSeason) &&
+                if (item is Label label && int.TryParse(label.Content.ToString(), out var labelSeason) &&
                     labelSeason != ActiveSeason)
-                    (item as Label).Background =
-                        (Brush) new BrushConverter().ConvertFrom(configurationService.LabelInActiveColor);
+                    label.Background = LabelBackGround(labelSeason - 1, false);
         }
 
         private void OnLabelMouseEnter(object sender, EventArgs e)
         {
-            // This construct checks for null value
+            // [!] This construct checks for null value
             if (sender is Label label && int.TryParse(label.Content.ToString(), out var labelSeason) &&
                 labelSeason != ActiveSeason)
-                label.Background =
-                    (Brush) new BrushConverter().ConvertFrom(configurationService.LabelActiveColor);
+                label.Background = LabelBackGround(labelSeason - 1, true);
         }
 
         private void OnLabelMouseLeave(object sender, EventArgs e)
         {
-            // This construct checks for null value
             if (sender is Label label && int.TryParse(label.Content.ToString(), out var labelSeason) &&
                 labelSeason != ActiveSeason)
-                label.Background =
-                    (Brush) new BrushConverter().ConvertFrom(configurationService.LabelInActiveColor);
+                label.Background = LabelBackGround(labelSeason - 1, false);
         }
 
         private void listBoxSeries_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -115,6 +158,7 @@ namespace SeriesUI
 
         private Label GetNewLabel(int sequence)
         {
+            // [!] No need to set the background here since we reset it after creating the labels
             var labelWidth = configurationService.LabelWidth;
             var labelHeight = configurationService.LabelHeight;
             var labelSpacing = configurationService.LabelSpacing;
@@ -124,7 +168,6 @@ namespace SeriesUI
                 Width = labelWidth,
                 Height = labelHeight,
                 Content = sequence + 1,
-                Background = (Brush) new BrushConverter().ConvertFrom(configurationService.LabelInActiveColor),
                 BorderThickness = new Thickness(0),
                 BorderBrush = Brushes.Black,
                 HorizontalContentAlignment = HorizontalAlignment.Center,
@@ -147,7 +190,7 @@ namespace SeriesUI
             {
                 Cursor = Cursors.Wait;
 
-                SeriesList.Refresh();
+                seriesList.Refresh();
 
                 listBoxSeries.Items.Refresh();
             }
@@ -159,13 +202,13 @@ namespace SeriesUI
 
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
-            SeriesList.SaveToDisk();
+            seriesList.SaveToDisk();
         }
 
         private void btnReload_Click(object sender, RoutedEventArgs e)
         {
-            SeriesList.ReloadFromDisk();
-            listBoxSeries.ItemsSource = SeriesList.Series;
+            seriesList.ReloadFromDisk();
+            listBoxSeries.ItemsSource = seriesList.Series;
         }
 
         private void GrdEpisodesClick(object sender, RoutedEventArgs e)
@@ -176,11 +219,11 @@ namespace SeriesUI
             {
                 case "NL":
                     ((Series) listBoxSeries.SelectedItems[0])?.Seasons[ActiveSeason - 1]
-                        .ToggleAllSubs(Episode.SubTitle.NL);
+                        .ToggleAllSubs(Episode.SubTitle.Nl);
                     break;
                 case "EN":
                     ((Series) listBoxSeries.SelectedItems[0])?.Seasons[ActiveSeason - 1]
-                        .ToggleAllSubs(Episode.SubTitle.EN);
+                        .ToggleAllSubs(Episode.SubTitle.En);
                     break;
                 case "DOWNLOADED":
                     ((Series) listBoxSeries.SelectedItems[0])?.Seasons[ActiveSeason - 1].ToggleDownloaded();
@@ -189,7 +232,7 @@ namespace SeriesUI
                 case "TITLE":
                     break;
                 default:
-                    Common.Log($"ERROR: Non-coded column header: {header}");
+                    Common.Common.Log($"ERROR: Non-coded column header: {header}");
                     break;
             }
 
@@ -198,9 +241,12 @@ namespace SeriesUI
 
         private void btnDebug_Click(object sender, RoutedEventArgs e)
         {
-            var result = ((Series) listBoxSeries.SelectedItems[0]).Seasons[ActiveSeason - 1].Completeness;
+            var series = (Series) listBoxSeries.SelectedItems[0];
 
-            MessageBox.Show(result.ToString());
+            var seasonCompleteness = series.Seasons[ActiveSeason - 1].Episodes
+                .Where(c => c.Completeness > CompletenessState.NotApplicable).Select(x => x.Completeness).Max();
+
+            MessageBox.Show(seasonCompleteness.ToString());
         }
     }
 }

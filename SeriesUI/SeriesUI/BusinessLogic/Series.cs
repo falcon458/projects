@@ -41,7 +41,7 @@ namespace SeriesUI.BusinessLogic
                 if (int.TryParse(match.Value, out var intValue))
                     Seasons.Add(new Season(intValue));
                 else
-                    Common.Log($"ERROR: Non-numeric match for season: {match.Value}");
+                    Common.Common.Log($"ERROR: Non-numeric match for season: {match.Value}");
         }
 
         private void GetEpisodes()
@@ -62,7 +62,7 @@ namespace SeriesUI.BusinessLogic
 
                 // Verify number of episodes and dates
                 if (episodeDates.Count != episodeNames.Count || episodeDates.Count == 0)
-                    Common.Log(
+                    Common.Common.Log(
                         $"ERROR: Unequal or zero number of episodes ({episodeNames.Count}) and dates ({episodeDates.Count}) for \"{Name}\", season {i}");
                 else
                     for (var j = 0; j < episodeNames.Count; j++)
@@ -77,7 +77,7 @@ namespace SeriesUI.BusinessLogic
                         }
                         else
                         {
-                            Common.Log($"ERROR: Conversion to date failed for {episodeDates[j]}");
+                            Common.Common.Log($"ERROR: Conversion to date failed for {episodeDates[j]}");
                         }
                     }
             }

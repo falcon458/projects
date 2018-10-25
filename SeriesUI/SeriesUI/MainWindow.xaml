@@ -40,7 +40,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn MinWidth="20" Header="NL">
+                <DataGridTemplateColumn MinWidth="20" Header="Nl">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Grid>
@@ -50,7 +50,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn MinWidth="20" Header="EN">
+                <DataGridTemplateColumn MinWidth="20" Header="En">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Grid>

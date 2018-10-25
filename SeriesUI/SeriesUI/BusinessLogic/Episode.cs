@@ -4,24 +4,41 @@ using System.Collections.Generic;
 namespace SeriesUI.BusinessLogic
 {
     [Serializable]
-    internal class Episode
+    public class Episode
     {
         public enum SubTitle
         {
-            NL,
-            EN
+            Nl,
+            En
         }
 
         public Episode()
         {
             SubTitles = new Dictionary<SubTitle, bool>();
-            SubTitles[SubTitle.NL] = false;
-            SubTitles[SubTitle.EN] = false;
+            SubTitles[SubTitle.Nl] = false;
+            SubTitles[SubTitle.En] = false;
         }
 
         public Episode(string title) : this()
         {
             Title = title;
+        }
+
+        public CompletenessState Completeness
+        {
+            get
+            {
+                var result = CompletenessState.Complete;
+
+                // Ignore future episodes
+                if (AirDate.Date >= DateTime.Today.Date) result = CompletenessState.NotApplicable;
+                else if (!Downloaded) result = CompletenessState.NotDownloaded;
+                else if (!SubTitles[SubTitle.Nl] && !SubTitles[SubTitle.En])
+                    result = CompletenessState.NotSubbed;
+                else if (!SubTitles[SubTitle.Nl]) result = CompletenessState.NotSubbedNl;
+
+                return result;
+            }
         }
 
         public DateTime AirDate { get; set; }

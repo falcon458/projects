@@ -9,9 +9,9 @@ namespace SeriesUI.BusinessLogic
 {
     internal class SeriesList
     {
-        private readonly ConfigurationService configurationService;
+        private readonly IConfigurationService configurationService;
 
-        public SeriesList(ConfigurationService configurationService)
+        public SeriesList(IConfigurationService configurationService)
         {
             Series = new List<Series>();
 

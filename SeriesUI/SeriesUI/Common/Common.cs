@@ -1,7 +1,15 @@
 ﻿using System;
 
-namespace SeriesUI.BusinessLogic
+namespace SeriesUI.Common
 {
+    public enum CompletenessState
+    {
+        Complete,
+        NotSubbedNl,
+        NotSubbed,
+        NotDownloaded
+    }
+
     public static class Common
     {
         public static void Log(string message)

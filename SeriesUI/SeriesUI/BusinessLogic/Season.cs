@@ -4,8 +4,17 @@ using System.Linq;
 
 namespace SeriesUI.BusinessLogic
 {
+    public enum CompletenessState
+    {
+        NotApplicable,
+        Complete,
+        NotSubbedNl,
+        NotSubbed,
+        NotDownloaded
+    }
+
     [Serializable]
-    internal class Season
+    public class Season
     {
         public Season(int sequence)
         {
@@ -17,28 +26,23 @@ namespace SeriesUI.BusinessLogic
 
         public List<Episode> Episodes { get; set; }
 
-        public int Completeness
+        public CompletenessState Completeness
         {
             get
             {
-                var result = (int) CompletenessStates.Complete;
-                var i = -1;
-                while (result < (int) CompletenessStates.NotDownloaded && i < Episodes.Count - 1)
-                {
-                    i++;
+                // Select the worst completeness
+                var seasonCompleteness = Episodes.Where(c => c.Completeness > CompletenessState.NotApplicable)
+                    .Select(x => x.Completeness).Max();
 
-                    if (Episodes[i].AirDate.Date >= DateTime.Today.Date) continue;
-
-                    if (!Episodes[i].Downloaded)
-                        result = Math.Max(result, (int) CompletenessStates.NotDownloaded);
-                    else if (!Episodes[i].SubTitles[Episode.SubTitle.NL] && !Episodes[i].SubTitles[Episode.SubTitle.EN])
-                        result = Math.Max(result, (int) CompletenessStates.NotSubbed);
-                    else if (!Episodes[i].SubTitles[Episode.SubTitle.NL])
-                        result = Math.Max(result, (int) CompletenessStates.NotSubbedNl);
-                }
-
-                return result;
+                return seasonCompleteness;
             }
+        }
+
+        private CompletenessState Max(CompletenessState arg1, CompletenessState arg2)
+        {
+            var result = (CompletenessState) Math.Max((int) arg1, (int) arg2);
+
+            return result;
         }
 
         public void SetAllSubs(Episode.SubTitle sub)
@@ -75,14 +79,6 @@ namespace SeriesUI.BusinessLogic
 
                 Episodes.ToList().ForEach(c => c.Downloaded = checkedValue);
             }
-        }
-
-        private enum CompletenessStates
-        {
-            Complete,
-            NotSubbedNl,
-            NotSubbed,
-            NotDownloaded
         }
     }
 }

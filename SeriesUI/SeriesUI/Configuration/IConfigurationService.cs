@@ -2,9 +2,17 @@
 {
     internal interface IConfigurationService
     {
-        string LabelInActiveColor { get; }
+        string InActiveCompleteColor { get; }
+        string ActiveCompleteColor { get; }
 
-        string LabelActiveColor { get; }
+        string InActiveNotSubbedNlColor { get; }
+        string ActiveNotSubbedNlColor { get; }
+
+        string InActiveNotSubbedColor { get; }
+        string ActiveNotSubbedColor { get; }
+
+        string InActiveNotDownloadedColor { get; }
+        string ActiveNotDownloadedColor { get; }
 
         int LabelWidth { get; }
 

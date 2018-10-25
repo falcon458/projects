@@ -28,8 +28,17 @@ namespace SeriesUI.Configuration
 
         #region IConfigurationService Members
 
-        public string LabelInActiveColor => appSettings["LabelInActiveColor"];
-        public string LabelActiveColor => appSettings["LabelActiveColor"];
+        public string InActiveCompleteColor => appSettings["InActiveCompleteColor"];
+        public string ActiveCompleteColor => appSettings["ActiveCompleteColor"];
+
+        public string InActiveNotSubbedNlColor => appSettings["InActiveNotSubbedNlColor"];
+        public string ActiveNotSubbedNlColor => appSettings["ActiveNotSubbedNlColor"];
+
+        public string InActiveNotSubbedColor => appSettings["InActiveNotSubbedColor"];
+        public string ActiveNotSubbedColor => appSettings["ActiveNotSubbedColor"];
+
+        public string InActiveNotDownloadedColor => appSettings["InActiveNotDownloadedColor"];
+        public string ActiveNotDownloadedColor => appSettings["ActiveNotDownloadedColor"];
 
         public int LabelWidth
         {
