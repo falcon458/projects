@@ -14,7 +14,7 @@ namespace SeriesUI.BusinessLogic
             Episodes = new List<Episode>();
         }
 
-        public int Sequence { get; }
+        private int Sequence { get; }
 
         public List<Episode> Episodes { get; set; }
 
@@ -30,26 +30,9 @@ namespace SeriesUI.BusinessLogic
             }
         }
 
-        private CompletenessState Max(CompletenessState arg1, CompletenessState arg2)
-        {
-            var result = (CompletenessState) Math.Max((int) arg1, (int) arg2);
+        #region Class methods
 
-            return result;
-        }
-
-        public void SetAllSubs(Episode.SubTitle sub)
-        {
-            foreach (var episode in Episodes)
-                episode.SubTitles[sub] = true;
-        }
-
-        public void SetAllEpisodesDownloaded()
-        {
-            foreach (var episode in Episodes)
-                episode.Downloaded = true;
-        }
-
-        public void ToggleAllSubs(Episode.SubTitle subTitle)
+        public void ToggleAllSubs(SubTitle subTitle)
         {
             // [!] Somehow, using:
             // c.SubTitles[subTitle] = !Episodes[0].SubTitles[subTitle];
@@ -72,5 +55,26 @@ namespace SeriesUI.BusinessLogic
                 Episodes.ToList().ForEach(c => c.Downloaded = checkedValue);
             }
         }
+
+        private CompletenessState Max(CompletenessState arg1, CompletenessState arg2)
+        {
+            var result = (CompletenessState) Math.Max((int) arg1, (int) arg2);
+
+            return result;
+        }
+
+        public void SetAllSubs(SubTitle sub)
+        {
+            foreach (var episode in Episodes)
+                episode.SubTitles[sub] = true;
+        }
+
+        public void SetAllEpisodesDownloaded()
+        {
+            foreach (var episode in Episodes)
+                episode.Downloaded = true;
+        }
+
+        #endregion
     }
 }

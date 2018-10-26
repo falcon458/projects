@@ -8,7 +8,7 @@ using SeriesUI.Common;
 namespace SeriesUI.Configuration
 {
     public class ColorConfiguration : IValueConverter
-    {
+    {   
         public readonly Dictionary<int, Brush> colorPalette;
 
         private readonly IConfigurationService configurationService;
@@ -41,10 +41,12 @@ namespace SeriesUI.Configuration
         /// <returns></returns>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var result = (Brush) new BrushConverter().ConvertFrom("White");
+            Brush result;
 
             if (value is CompletenessState stateValue)
-                return colorPalette[new ColorPaletteKey(stateValue, false).GetHashCode()];
+                result = colorPalette[new ColorPaletteKey(stateValue, false).GetHashCode()];
+            else
+                result = (Brush) new BrushConverter().ConvertFrom("White");
 
             return result;
         }

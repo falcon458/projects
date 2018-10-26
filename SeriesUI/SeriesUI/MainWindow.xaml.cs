@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -6,18 +7,22 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using SeriesUI.BusinessLogic;
+using SeriesUI.Common;
 using SeriesUI.Configuration;
 
 // TODO: Andere kleuren? Omranden?
 // Refresh-merge (equals method?)
 // Why do we need to refresh in btnAllNlSubs_Click (and others) to update the grid?
-// Colors in grid
 // INotifyPropertyChanged:
 //     - Ask when outstanding unsaved changes
-//     - Zorg dat wijzigingen direct nieuwe kleuren geven.
 // Log to file
 // Better Call Saul - S04E06 - PiÃ±ata
 // ColorConfiguration class heeft 2 constructors die beiden worden gebruikt, we hebben dus 2 instances. Kijk of we met 1 af kunnen
+// warnings in xaml:  <configuration:ColorConfiguration x:Key="CompletenessToBrushConverter"/>, en anderen
+// alle warnings
+// Complete in datagrid = white
+// Zie SetEpisodeEventHandlers: Is dit echt de enige manier om de eventhandler in deze class te krijgen?
+
 
 namespace SeriesUI
 {
@@ -166,6 +171,7 @@ namespace SeriesUI
                 Cursor = Cursors.Wait;
 
                 seriesList.Refresh();
+                SetEpisodeEventHandlers();
 
                 listBoxSeries.Items.Refresh();
             }
@@ -183,6 +189,7 @@ namespace SeriesUI
         private void btnReload_Click(object sender, RoutedEventArgs e)
         {
             seriesList.ReloadFromDisk();
+            SetEpisodeEventHandlers();
             listBoxSeries.ItemsSource = seriesList.Series;
         }
 
@@ -194,11 +201,11 @@ namespace SeriesUI
             {
                 case "NL":
                     ((Series) listBoxSeries.SelectedItems[0])?.Seasons[ActiveSeason - 1]
-                        .ToggleAllSubs(Episode.SubTitle.Nl);
+                        .ToggleAllSubs(SubTitle.Nl);
                     break;
                 case "EN":
                     ((Series) listBoxSeries.SelectedItems[0])?.Seasons[ActiveSeason - 1]
-                        .ToggleAllSubs(Episode.SubTitle.En);
+                        .ToggleAllSubs(SubTitle.En);
                     break;
                 case "DOWNLOADED":
                     ((Series) listBoxSeries.SelectedItems[0])?.Seasons[ActiveSeason - 1].ToggleDownloaded();
@@ -214,9 +221,33 @@ namespace SeriesUI
             grdEpisodes.Items.Refresh();
         }
 
+        private void SetEpisodeEventHandlers()
+        {
+            foreach (var series in seriesList.Series)
+            foreach (var season in series.Seasons)
+            foreach (var episode in season.Episodes)
+                episode.PropertyChanged += EpisodeChangeHandler;
+        }
+
+        private void EpisodeChangeHandler(object sender, PropertyChangedEventArgs e)
+        {
+            grdEpisodes.Items.Refresh();
+        }
+
         private void btnDebug_Click(object sender, RoutedEventArgs e)
         {
-            //grdEpisodes.
+            // grdEpisodes.Items.Refresh();
+
+            // ((Series) listBoxSeries.SelectedItems[0]).Seasons[ActiveSeason - 1].Episodes[0].PropertyChanged += Tst;
+
+            //dummyEpisode.PropertyChanged += new PropertyChangedEventHandler(Tst);
+
+            //EventPrivateKey bindingsource
         }
+
+        //private PropertyChangedEventHandler tst()
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
 }

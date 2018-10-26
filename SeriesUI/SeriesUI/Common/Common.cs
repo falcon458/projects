@@ -11,6 +11,12 @@ namespace SeriesUI.Common
         NotDownloaded
     }
 
+    public enum SubTitle
+    {
+        Nl,
+        En
+    }
+
     public static class Common
     {
         public static void Log(string message)
