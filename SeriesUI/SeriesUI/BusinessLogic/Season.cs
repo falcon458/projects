@@ -24,8 +24,7 @@ namespace SeriesUI.BusinessLogic
             {
                 // Select the worst completeness
                 var seasonCompleteness = Episodes.Where(c => c.Completeness > CompletenessState.NotApplicable)
-                    .Select(x => x.Completeness).Max();
-
+                    .Select(x => x.Completeness).DefaultIfEmpty(CompletenessState.Complete).Max();
                 return seasonCompleteness;
             }
         }

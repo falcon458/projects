@@ -12,6 +12,9 @@ using SeriesUI.Common;
 using SeriesUI.Configuration;
 
 // TODO:
+// Episodes met date="onbekend" komen niet mee
+
+// Completeness in series grid
 // Andere kleuren? Omranden?
 // INotifyPropertyChanged:
 //     - refresh series list aan de praat krijgen: IsAsync gebruiken? (https://social.technet.microsoft.com/wiki/contents/articles/30203.wpf-asynchronous-data-binding-using-isasync-and-delay.aspx)
@@ -252,6 +255,7 @@ namespace SeriesUI
             grdEpisodes.Items.Refresh();
             IsDataModified = true;
             SetActiveLabelColor();
+            listBoxSeries.Items.Refresh();
         }
 
         private void SeriesListChangeHandler(object sender, NotifyCollectionChangedEventArgs e)
@@ -270,6 +274,15 @@ namespace SeriesUI
 
         private void btnDebug_Click(object sender, RoutedEventArgs e)
         {
+            foreach (var entryItem in listBoxSeries.Items)
+                if (entryItem is Series)
+                {
+                    var series = entryItem as Series;
+
+                    // Select the worst completeness
+                    MessageBox.Show(series.Name + ": " + series.Completeness);
+                }
+
             //IsSavedButtonActive = !IsSavedButtonActive;
             //MessageBox.Show(IsSavedButtonActive.ToString());
 

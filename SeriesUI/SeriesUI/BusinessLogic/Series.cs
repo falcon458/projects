@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
+using SeriesUI.Common;
 
 namespace SeriesUI.BusinessLogic
 {
@@ -21,6 +22,18 @@ namespace SeriesUI.BusinessLogic
         public string LocalUrl { get; set; }
 
         public List<Season> Seasons { get; set; }
+
+        public CompletenessState Completeness
+        {
+            get
+            {
+                // Select the worst completeness
+                var seriesCompleteness = Seasons.Where(c => c.Completeness > CompletenessState.NotApplicable)
+                    .Select(x => x.Completeness).Max();
+
+                return seriesCompleteness;
+            }
+        }
 
         public void GetDataFromWebsite()
         {

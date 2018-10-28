@@ -14,9 +14,19 @@
     <Grid Margin="0,-24,0,0">
         <ListBox x:Name="listBoxSeries" DisplayMemberPath="Name" HorizontalAlignment="Left" Height="353"
                  Margin="25,70,0,0" VerticalAlignment="Top" Width="187"
-                 SelectionChanged="listBoxSeries_SelectionChanged" ItemsSource="{Binding Name}" />
+                 SelectionChanged="listBoxSeries_SelectionChanged" ItemsSource="{Binding Name}">
+
+            <ListBox.Resources>
+                <Style TargetType="ListBoxItem">
+                    <Style.Setters>
+                        <Setter Property="Background"
+                                Value="{Binding Completeness, Converter={StaticResource CompletenessToBrushConverter}}" />
+                    </Style.Setters>
+                </Style>
+            </ListBox.Resources>
+        </ListBox>
         <Grid x:Name="grdSeasons" Height="40" Margin="229,25,10,0" VerticalAlignment="Top" />
-        <Button x:Name="btnSave"  Content="Save" HorizontalAlignment="Left" Margin="42,494,0,0" VerticalAlignment="Top"
+        <Button x:Name="btnSave" Content="Save" HorizontalAlignment="Left" Margin="42,494,0,0" VerticalAlignment="Top"
                 Width="75" Click="btnSave_Click" IsEnabled="{Binding IsDataModified, ElementName=mainWindow}" />
         <Button x:Name="btnRefresh" Content="Refresh" HorizontalAlignment="Left" Margin="42,444,0,0"
                 VerticalAlignment="Top" Width="75" Click="btnRefresh_Click" />
