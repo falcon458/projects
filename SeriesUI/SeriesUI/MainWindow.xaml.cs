@@ -13,8 +13,6 @@ using SeriesUI.Configuration;
 
 // TODO:
 // Andere kleuren? Omranden?
-// Refresh-merge (equals method?)
-
 // INotifyPropertyChanged:
 //     - refresh series list aan de praat krijgen: IsAsync gebruiken? (https://social.technet.microsoft.com/wiki/contents/articles/30203.wpf-asynchronous-data-binding-using-isasync-and-delay.aspx)
 // Log to file

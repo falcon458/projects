@@ -30,7 +30,9 @@ namespace SeriesUI.BusinessLogic
 
         public string Title { get; set; }
 
-        public bool Downloaded
+        public string Number { get; set; }
+
+    public bool Downloaded
         {
             get => downloaded;
             set

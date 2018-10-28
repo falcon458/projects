@@ -14,7 +14,7 @@ namespace SeriesUI.BusinessLogic
             Episodes = new List<Episode>();
         }
 
-        private int Sequence { get; }
+        public int Sequence { get; }
 
         public List<Episode> Episodes { get; set; }
 
@@ -42,7 +42,17 @@ namespace SeriesUI.BusinessLogic
             {
                 var checkedValue = !Episodes[0].SubTitles[subTitle];
 
-                Episodes.ToList().ForEach(c => c.SubTitles[subTitle] = checkedValue);
+                switch (subTitle)
+                {
+                    case SubTitle.Nl:
+                        Episodes.ToList().ForEach(c => c.SubTitleNl = checkedValue);
+                        break;
+                    case SubTitle.En:
+                        Episodes.ToList().ForEach(c => c.SubTitleEn = checkedValue);
+                        break;
+                    default:
+                        throw new ArgumentException("Invalid subtitle provided");
+                }
             }
         }
 

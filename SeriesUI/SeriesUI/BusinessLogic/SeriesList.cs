@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using SeriesUI.Configuration;
@@ -49,23 +50,49 @@ namespace SeriesUI.BusinessLogic
 
         public void Refresh()
         {
-            ClearSeries();
+            // Load the series into a new list of Series
+            var newSeries = new ObservableCollection<Series>();
 
             var placeHolder = configurationService.SeriesPlaceHolder.text;
 
-            foreach (SeriesConfigElement newSeries in configurationService.SeriesConfigCollection)
+            foreach (SeriesConfigElement newSeriesConfig in configurationService.SeriesConfigCollection)
             {
                 var series = new Series
                 {
-                    Name = newSeries.Name,
+                    Name = newSeriesConfig.Name,
                     WebSite = configurationService.SeriesWebSite.url,
                     LocalUrl = configurationService.SeriesWebSiteLocation.url.Replace(placeHolder,
-                        newSeries.Name.Replace(" ", "-").ToLower())
+                        newSeriesConfig.Name.Replace(" ", "-").ToLower())
                 };
 
                 series.GetDataFromWebsite();
-                Series.Add(series);
+                newSeries.Add(series);
             }
+
+            MergeListOfSeries(Series, newSeries);
+
+            ClearSeries();
+
+            // Move the series. Setting Series to newSeries would mess up binding with the listBox
+            foreach (var series in newSeries) Series.Add(series);
+        }
+
+        private void MergeListOfSeries(ObservableCollection<Series> oldSeries, ObservableCollection<Series> newSeries)
+        {
+            foreach (var newSeriesEntry in newSeries)
+            foreach (var newSeasonEntry in newSeriesEntry.Seasons)
+            foreach (var newEpisodeEntry in newSeasonEntry.Episodes)
+                // Combining these if statements gives "Possible NullRefException)
+                if (oldSeries.FirstOrDefault(c => c.Name == newSeriesEntry.Name) is Series oldSeriesEntry)
+                    if (oldSeriesEntry.Seasons.FirstOrDefault(d => d.Sequence == newSeasonEntry.Sequence) is Season
+                        oldSeasonEntry)
+                        if (oldSeasonEntry.Episodes.FirstOrDefault(e => e.Number == newEpisodeEntry.Number) is Episode
+                            oldEpisodeEntry)
+                        {
+                            newEpisodeEntry.Downloaded = oldEpisodeEntry.Downloaded;
+                            newEpisodeEntry.SubTitleEn = oldEpisodeEntry.SubTitleEn;
+                            newEpisodeEntry.SubTitleNl = oldEpisodeEntry.SubTitleNl;
+                        }
         }
 
         public void ClearSeries()

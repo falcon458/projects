@@ -55,10 +55,11 @@ namespace SeriesUI.BusinessLogic
                 webPage.getCode();
 
                 // Extract the episodes
-                var regex = new Regex($@"href=.*>(S0*?{i}E\d+.*)</a>.*?\n.*?</td>.*?\n.*?<td>.*?\n.*?(\d+/\d+/\d+)");
+                var regex = new Regex($@"href=.*>((S0*?{i}E\d+).*)</a>.*?\n.*?</td>.*?\n.*?<td>.*?\n.*?(\d+/\d+/\d+)");
                 var matchResult = regex.Matches(webPage.PageSource);
                 var episodeNames = (from Match m1 in matchResult select m1.Groups[1]).ToList();
-                var episodeDates = (from Match m1 in matchResult select m1.Groups[2]).ToList();
+                var episodeNumbers = (from Match m1 in matchResult select m1.Groups[2]).ToList();
+                var episodeDates = (from Match m1 in matchResult select m1.Groups[3]).ToList();
 
                 // Verify number of episodes and dates
                 if (episodeDates.Count != episodeNames.Count || episodeDates.Count == 0)
@@ -73,6 +74,8 @@ namespace SeriesUI.BusinessLogic
                             CultureInfo.InvariantCulture, DateTimeStyles.None, out var airDate))
                         {
                             episode.AirDate = airDate;
+                            episode.Number = episodeNumbers[j].ToString();
+
                             Seasons[i - 1].Episodes.Add(episode);
                         }
                         else
