@@ -117,8 +117,13 @@ namespace SeriesUI
         private void OnLabelMouseEnter(object sender, EventArgs e)
         {
             // [!] This construct checks for null value
-            if (sender is Label label && int.TryParse(label.Content.ToString(), out var labelSeason) &&
-                labelSeason != ActiveSeason)
+            if (sender is Label label)
+                SetLabelBackground(label, false);
+        }
+
+        private void SetLabelBackground(Label label, bool force)
+        {
+            if (int.TryParse(label.Content.ToString(), out var labelSeason) && (labelSeason != ActiveSeason || force))
                 label.Background = LabelBackGround(labelSeason - 1, true);
         }
 
@@ -248,12 +253,21 @@ namespace SeriesUI
         {
             grdEpisodes.Items.Refresh();
             IsDataModified = true;
+            SetActiveLabelColor();
         }
 
         private void SeriesListChangeHandler(object sender, NotifyCollectionChangedEventArgs e)
         {
             listBoxSeries.Items.Refresh();
             IsDataModified = true;
+        }
+
+        private void SetActiveLabelColor()
+        {
+            foreach (var item in grdSeasons.Children)
+                if (item is Label label && int.TryParse(label.Content.ToString(), out var labelSeason) &&
+                    labelSeason == ActiveSeason)
+                    SetLabelBackground(label, true);
         }
 
         private void btnDebug_Click(object sender, RoutedEventArgs e)
