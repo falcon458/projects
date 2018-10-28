@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -13,12 +14,12 @@ namespace SeriesUI.BusinessLogic
 
         public SeriesList(IConfigurationService configurationService)
         {
-            Series = new List<Series>();
+            Series = new ObservableCollection<Series>();
 
             this.configurationService = configurationService;
         }
 
-        public List<Series> Series { get; private set; }
+        public ObservableCollection<Series> Series { get; private set; }
 
         public void ReloadFromDisk()
         {
@@ -31,7 +32,7 @@ namespace SeriesUI.BusinessLogic
             var buffer = File.OpenRead(fileName);
 
             // Invoke the Deserialize method. This yields a new Series object
-            Series = formatter.Deserialize(buffer) as List<Series>;
+            Series = formatter.Deserialize(buffer) as ObservableCollection<Series>;
 
             // Close the stream.
             buffer.Close();

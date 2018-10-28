@@ -10,17 +10,19 @@ using SeriesUI.BusinessLogic;
 using SeriesUI.Common;
 using SeriesUI.Configuration;
 
-// TODO: Andere kleuren? Omranden?
+// TODO:
+// Andere kleuren? Omranden?
 // Refresh-merge (equals method?)
-// Why do we need to refresh in btnAllNlSubs_Click (and others) to update the grid?
 // INotifyPropertyChanged:
 //     - Ask when outstanding unsaved changes
-// Log to file
 // Better Call Saul - S04E06 - PiÃ±ata
+// Complete in datagrid = white
+
+// Log to file
+// Why do we need to refresh in btnAllNlSubs_Click (and others) to update the grid?
 // ColorConfiguration class heeft 2 constructors die beiden worden gebruikt, we hebben dus 2 instances. Kijk of we met 1 af kunnen
 // warnings in xaml:  <configuration:ColorConfiguration x:Key="CompletenessToBrushConverter"/>, en anderen
 // alle warnings
-// Complete in datagrid = white
 // Zie SetEpisodeEventHandlers: Is dit echt de enige manier om de eventhandler in deze class te krijgen?
 
 
