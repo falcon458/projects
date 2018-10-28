@@ -14,7 +14,6 @@ using SeriesUI.Configuration;
 // TODO:
 // Andere kleuren? Omranden?
 // Refresh-merge (equals method?)
-// Better Call Saul - S04E06 - PiÃ±ata
 // Complete in datagrid = white
 
 // INotifyPropertyChanged:

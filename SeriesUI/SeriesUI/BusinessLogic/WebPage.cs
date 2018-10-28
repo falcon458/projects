@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Text;
 
 namespace SeriesUI.BusinessLogic
 {
@@ -22,7 +23,9 @@ namespace SeriesUI.BusinessLogic
 
         public void getCode()
         {
-            var html = new WebClient().DownloadString(Url);
+            var webClient = new WebClient();
+            webClient.Encoding = Encoding.UTF8;
+            var html = webClient.DownloadString(Url);
 
             PageSource = html;
         }
