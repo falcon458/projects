@@ -68,7 +68,7 @@ namespace SeriesUI.BusinessLogic
                 OnPropertyChanged(nameof(SubTitleEn));
             }
         }
-        
+
         #region Class methods
 
         public CompletenessState Completeness

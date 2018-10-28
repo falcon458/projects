@@ -7,7 +7,7 @@
         xmlns:configuration="clr-namespace:SeriesUI.Configuration"
         mc:Ignorable="d"
         Name="mainWindow"
-        Title="Series" Height="589.767" Width="1007.225">
+        Title="Series" Height="589.767" Width="1007.225" Closing="mainWindow_Closing">
     <Window.Resources>
         <configuration:ColorConfiguration x:Key="CompletenessToBrushConverter" />
     </Window.Resources>
@@ -16,8 +16,8 @@
                  Margin="25,70,0,0" VerticalAlignment="Top" Width="187"
                  SelectionChanged="listBoxSeries_SelectionChanged" ItemsSource="{Binding Name}" />
         <Grid x:Name="grdSeasons" Height="40" Margin="229,25,10,0" VerticalAlignment="Top" />
-        <Button x:Name="btnSave" Content="Save" HorizontalAlignment="Left" Margin="42,494,0,0" VerticalAlignment="Top"
-                Width="75" Click="btnSave_Click" />
+        <Button x:Name="btnSave"  Content="Save" HorizontalAlignment="Left" Margin="42,494,0,0" VerticalAlignment="Top"
+                Width="75" Click="btnSave_Click" IsEnabled="{Binding IsDataModified, ElementName=mainWindow}" />
         <Button x:Name="btnRefresh" Content="Refresh" HorizontalAlignment="Left" Margin="42,444,0,0"
                 VerticalAlignment="Top" Width="75" Click="btnRefresh_Click" />
         <Button x:Name="btnReload" Content="Reload" HorizontalAlignment="Left" Margin="42,469,0,0"

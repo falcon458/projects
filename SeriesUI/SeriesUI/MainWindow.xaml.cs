@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
@@ -13,18 +14,17 @@ using SeriesUI.Configuration;
 // TODO:
 // Andere kleuren? Omranden?
 // Refresh-merge (equals method?)
-// INotifyPropertyChanged:
-//     - Ask when outstanding unsaved changes
 // Better Call Saul - S04E06 - PiÃ±ata
 // Complete in datagrid = white
 
+// INotifyPropertyChanged:
+//     - refresh series list aan de praat krijgen: IsAsync gebruiken? (https://social.technet.microsoft.com/wiki/contents/articles/30203.wpf-asynchronous-data-binding-using-isasync-and-delay.aspx)
 // Log to file
 // Why do we need to refresh in btnAllNlSubs_Click (and others) to update the grid?
 // ColorConfiguration class heeft 2 constructors die beiden worden gebruikt, we hebben dus 2 instances. Kijk of we met 1 af kunnen
 // warnings in xaml:  <configuration:ColorConfiguration x:Key="CompletenessToBrushConverter"/>, en anderen
 // alle warnings
 // Zie SetEpisodeEventHandlers: Is dit echt de enige manier om de eventhandler in deze class te krijgen?
-
 
 namespace SeriesUI
 {
@@ -33,6 +33,11 @@ namespace SeriesUI
     /// </summary>
     public partial class MainWindow : Window
     {
+        // Using a DependencyProperty as the backing store for IsSaved
+        public static readonly DependencyProperty IsModifiedProperty =
+            DependencyProperty.Register(nameof(IsDataModified), typeof(bool), typeof(MainWindow),
+                new PropertyMetadata(false));
+
         private readonly ColorConfiguration colorConfiguration;
         private readonly IConfigurationService configurationService;
         private readonly SeriesList seriesList;
@@ -46,8 +51,15 @@ namespace SeriesUI
             colorConfiguration = new ColorConfiguration(configurationService);
 
             seriesList = new SeriesList(configurationService);
+            seriesList.Series.CollectionChanged += SeriesListChangeHandler;
 
             listBoxSeries.ItemsSource = seriesList.Series;
+        }
+
+        public bool IsDataModified
+        {
+            get => (bool) GetValue(IsModifiedProperty);
+            set => SetValue(IsModifiedProperty, value);
         }
 
         // The current season (1-based)
@@ -176,6 +188,7 @@ namespace SeriesUI
                 SetEpisodeEventHandlers();
 
                 listBoxSeries.Items.Refresh();
+                IsDataModified = true;
             }
             finally
             {
@@ -186,6 +199,7 @@ namespace SeriesUI
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
             seriesList.SaveToDisk();
+            IsDataModified = false;
         }
 
         private void btnReload_Click(object sender, RoutedEventArgs e)
@@ -193,6 +207,7 @@ namespace SeriesUI
             seriesList.ReloadFromDisk();
             SetEpisodeEventHandlers();
             listBoxSeries.ItemsSource = seriesList.Series;
+            IsDataModified = false;
         }
 
         private void GrdEpisodesClick(object sender, RoutedEventArgs e)
@@ -234,10 +249,20 @@ namespace SeriesUI
         private void EpisodeChangeHandler(object sender, PropertyChangedEventArgs e)
         {
             grdEpisodes.Items.Refresh();
+            IsDataModified = true;
+        }
+
+        private void SeriesListChangeHandler(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            listBoxSeries.Items.Refresh();
+            IsDataModified = true;
         }
 
         private void btnDebug_Click(object sender, RoutedEventArgs e)
         {
+            //IsSavedButtonActive = !IsSavedButtonActive;
+            //MessageBox.Show(IsSavedButtonActive.ToString());
+
             // grdEpisodes.Items.Refresh();
 
             // ((Series) listBoxSeries.SelectedItems[0]).Seasons[ActiveSeason - 1].Episodes[0].PropertyChanged += Tst;
@@ -247,9 +272,25 @@ namespace SeriesUI
             //EventPrivateKey bindingsource
         }
 
-        //private PropertyChangedEventHandler tst()
-        //{
-        //    throw new NotImplementedException();
-        //}
+        private void mainWindow_Closing(object sender, CancelEventArgs e)
+        {
+            if (IsDataModified)
+            {
+                var reply = MessageBox.Show("Do you want to save the changes?", "Unsaved Changes!",
+                    MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+
+                switch (reply)
+                {
+                    case MessageBoxResult.No:
+                        break;
+                    case MessageBoxResult.Yes:
+                        seriesList.SaveToDisk();
+                        break;
+                    case MessageBoxResult.Cancel:
+                        e.Cancel = true;
+                        break;
+                }
+            }
+        }
     }
 }
