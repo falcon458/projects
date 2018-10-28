@@ -14,7 +14,6 @@ using SeriesUI.Configuration;
 // TODO:
 // Andere kleuren? Omranden?
 // Refresh-merge (equals method?)
-// Complete in datagrid = white
 
 // INotifyPropertyChanged:
 //     - refresh series list aan de praat krijgen: IsAsync gebruiken? (https://social.technet.microsoft.com/wiki/contents/articles/30203.wpf-asynchronous-data-binding-using-isasync-and-delay.aspx)
@@ -90,7 +89,7 @@ namespace SeriesUI
 
             if (listBoxSeries.SelectedItem is Series series)
             {
-                var key = new ColorPaletteKey(series.Seasons[season].Completeness, active)
+                var key = new ColorPaletteKey(series.Seasons[season].Completeness, active, typeof(Label))
                     .GetHashCode();
 
                 result = colorConfiguration.colorPalette[key];

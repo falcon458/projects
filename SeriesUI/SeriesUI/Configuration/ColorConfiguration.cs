@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 using SeriesUI.Common;
@@ -8,7 +9,7 @@ using SeriesUI.Common;
 namespace SeriesUI.Configuration
 {
     public class ColorConfiguration : IValueConverter
-    {   
+    {
         public readonly Dictionary<int, Brush> colorPalette;
 
         private readonly IConfigurationService configurationService;
@@ -44,7 +45,7 @@ namespace SeriesUI.Configuration
             Brush result;
 
             if (value is CompletenessState stateValue)
-                result = colorPalette[new ColorPaletteKey(stateValue, false).GetHashCode()];
+                result = colorPalette[new ColorPaletteKey(stateValue, false, typeof(DataGridRow)).GetHashCode()];
             else
                 result = (Brush) new BrushConverter().ConvertFrom("White");
 
@@ -59,30 +60,58 @@ namespace SeriesUI.Configuration
         private void ConfigurePallette()
         {
             // Initialize the Color Palette
-            colorPalette[new ColorPaletteKey(CompletenessState.Complete, true).GetHashCode()] =
-                (Brush) new BrushConverter().ConvertFrom(configurationService.ActiveCompleteColor);
-            colorPalette[new ColorPaletteKey(CompletenessState.Complete, false).GetHashCode()] =
-                (Brush) new BrushConverter().ConvertFrom(configurationService.InActiveCompleteColor);
 
-            colorPalette[new ColorPaletteKey(CompletenessState.NotSubbedNl, true).GetHashCode()] =
+            // Data rows
+            colorPalette[new ColorPaletteKey(CompletenessState.Complete, true, typeof(DataGridRow)).GetHashCode()] =
+                (Brush) new BrushConverter().ConvertFrom("White");
+            colorPalette[new ColorPaletteKey(CompletenessState.Complete, false, typeof(DataGridRow)).GetHashCode()] =
+                (Brush) new BrushConverter().ConvertFrom("White");
+
+            colorPalette[new ColorPaletteKey(CompletenessState.NotSubbedNl, true, typeof(DataGridRow)).GetHashCode()] =
                 (Brush) new BrushConverter().ConvertFrom(configurationService.ActiveNotSubbedNlColor);
-            colorPalette[new ColorPaletteKey(CompletenessState.NotSubbedNl, false).GetHashCode()] =
+            colorPalette[new ColorPaletteKey(CompletenessState.NotSubbedNl, false, typeof(DataGridRow)).GetHashCode()] =
                 (Brush) new BrushConverter().ConvertFrom(configurationService.InActiveNotSubbedNlColor);
 
-            colorPalette[new ColorPaletteKey(CompletenessState.NotSubbed, true).GetHashCode()] =
+            colorPalette[new ColorPaletteKey(CompletenessState.NotSubbed, true, typeof(DataGridRow)).GetHashCode()] =
                 (Brush) new BrushConverter().ConvertFrom(configurationService.ActiveNotSubbedColor);
-            colorPalette[new ColorPaletteKey(CompletenessState.NotSubbed, false).GetHashCode()] =
+            colorPalette[new ColorPaletteKey(CompletenessState.NotSubbed, false, typeof(DataGridRow)).GetHashCode()] =
                 (Brush) new BrushConverter().ConvertFrom(configurationService.InActiveNotSubbedColor);
 
-            colorPalette[new ColorPaletteKey(CompletenessState.NotDownloaded, true).GetHashCode()] =
-                (Brush) new BrushConverter().ConvertFrom(configurationService.ActiveNotDownloadedColor);
-            colorPalette[new ColorPaletteKey(CompletenessState.NotDownloaded, false).GetHashCode()] =
-                (Brush) new BrushConverter().ConvertFrom(configurationService.InActiveNotDownloadedColor);
+            colorPalette[new ColorPaletteKey(CompletenessState.NotDownloaded, true, typeof(DataGridRow)).GetHashCode()]
+                = (Brush) new BrushConverter().ConvertFrom(configurationService.ActiveNotDownloadedColor);
+            colorPalette[new ColorPaletteKey(CompletenessState.NotDownloaded, false, typeof(DataGridRow)).GetHashCode()]
+                = (Brush) new BrushConverter().ConvertFrom(configurationService.InActiveNotDownloadedColor);
 
-            colorPalette[new ColorPaletteKey(CompletenessState.NotApplicable, true).GetHashCode()] =
-                (Brush) new BrushConverter().ConvertFrom(configurationService.ActiveNotApplicableColor);
-            colorPalette[new ColorPaletteKey(CompletenessState.NotApplicable, false).GetHashCode()] =
-                (Brush) new BrushConverter().ConvertFrom(configurationService.InActiveNotApplicableColor);
+            colorPalette[new ColorPaletteKey(CompletenessState.NotApplicable, true, typeof(DataGridRow)).GetHashCode()]
+                = (Brush) new BrushConverter().ConvertFrom(configurationService.ActiveNotApplicableColor);
+            colorPalette[new ColorPaletteKey(CompletenessState.NotApplicable, false, typeof(DataGridRow)).GetHashCode()]
+                = (Brush) new BrushConverter().ConvertFrom(configurationService.InActiveNotApplicableColor);
+
+            // Labels
+            colorPalette[new ColorPaletteKey(CompletenessState.Complete, true, typeof(Label)).GetHashCode()] =
+                (Brush) new BrushConverter().ConvertFrom(configurationService.ActiveCompleteColor);
+            colorPalette[new ColorPaletteKey(CompletenessState.Complete, false, typeof(Label)).GetHashCode()] =
+                (Brush) new BrushConverter().ConvertFrom(configurationService.InActiveCompleteColor);
+
+            colorPalette[new ColorPaletteKey(CompletenessState.NotSubbedNl, true, typeof(Label)).GetHashCode()] =
+                (Brush) new BrushConverter().ConvertFrom(configurationService.ActiveNotSubbedNlColor);
+            colorPalette[new ColorPaletteKey(CompletenessState.NotSubbedNl, false, typeof(Label)).GetHashCode()] =
+                (Brush) new BrushConverter().ConvertFrom(configurationService.InActiveNotSubbedNlColor);
+
+            colorPalette[new ColorPaletteKey(CompletenessState.NotSubbed, true, typeof(Label)).GetHashCode()] =
+                (Brush) new BrushConverter().ConvertFrom(configurationService.ActiveNotSubbedColor);
+            colorPalette[new ColorPaletteKey(CompletenessState.NotSubbed, false, typeof(Label)).GetHashCode()] =
+                (Brush) new BrushConverter().ConvertFrom(configurationService.InActiveNotSubbedColor);
+
+            colorPalette[new ColorPaletteKey(CompletenessState.NotDownloaded, true, typeof(Label)).GetHashCode()]
+                = (Brush) new BrushConverter().ConvertFrom(configurationService.ActiveNotDownloadedColor);
+            colorPalette[new ColorPaletteKey(CompletenessState.NotDownloaded, false, typeof(Label)).GetHashCode()]
+                = (Brush) new BrushConverter().ConvertFrom(configurationService.InActiveNotDownloadedColor);
+
+            colorPalette[new ColorPaletteKey(CompletenessState.NotApplicable, true, typeof(Label)).GetHashCode()]
+                = (Brush) new BrushConverter().ConvertFrom(configurationService.ActiveNotApplicableColor);
+            colorPalette[new ColorPaletteKey(CompletenessState.NotApplicable, false, typeof(Label)).GetHashCode()]
+                = (Brush) new BrushConverter().ConvertFrom(configurationService.InActiveNotApplicableColor);
         }
     }
 }
