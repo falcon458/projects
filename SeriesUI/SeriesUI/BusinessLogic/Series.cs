@@ -68,7 +68,8 @@ namespace SeriesUI.BusinessLogic
                 webPage.getCode();
 
                 // Extract the episodes
-                var regex = new Regex($@"href=.*>((S0*?{i}E\d+).*)</a>.*?\n.*?</td>.*?\n.*?<td>.*?\n.*?(\d+/\d+/\d+)");
+                var regex = new Regex(
+                    $@"href=.*>((S0*?{i}E\d+).*)</a>\s*\n\s*</td>\s*\n\s*<td>\s*\n\s*(.*)\s*\n\s*</td>");
                 var matchResult = regex.Matches(webPage.PageSource);
                 var episodeNames = (from Match m1 in matchResult select m1.Groups[1]).ToList();
                 var episodeNumbers = (from Match m1 in matchResult select m1.Groups[2]).ToList();
@@ -83,18 +84,17 @@ namespace SeriesUI.BusinessLogic
                     {
                         // Translate HTML characters
                         var episode = new Episode(Name + " - " + WebUtility.HtmlDecode(episodeNames[j].ToString()));
+
                         if (DateTime.TryParseExact(episodeDates[j].ToString(), "dd/MM/yyyy",
                             CultureInfo.InvariantCulture, DateTimeStyles.None, out var airDate))
-                        {
                             episode.AirDate = airDate;
-                            episode.Number = episodeNumbers[j].ToString();
-
-                            Seasons[i - 1].Episodes.Add(episode);
-                        }
                         else
-                        {
-                            Common.Common.Log($"ERROR: Conversion to date failed for {episodeDates[j]}");
-                        }
+                            episode.AirDate =
+                                DateTime.ParseExact("31/12/2099", "dd/MM/yyyy", CultureInfo.InvariantCulture);
+
+                        episode.Number = episodeNumbers[j].ToString();
+
+                        Seasons[i - 1].Episodes.Add(episode);
                     }
             }
         }
