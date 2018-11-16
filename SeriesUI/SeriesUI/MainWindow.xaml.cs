@@ -21,6 +21,9 @@ using SeriesUI.Configuration;
 // warnings in xaml:  <configuration:ColorConfiguration x:Key="CompletenessToBrushConverter"/>, en anderen
 // alle warnings
 // Zie SetEpisodeEventHandlers: Is dit echt de enige manier om de eventhandler in deze class te krijgen?
+// Auto-load on startup
+// Auto-refresh in background and notify
+//WebClient vervangen door HttpClient(URI)
 
 namespace SeriesUI
 {
@@ -50,6 +53,8 @@ namespace SeriesUI
             seriesList.Series.CollectionChanged += SeriesListChangeHandler;
 
             listBoxSeries.ItemsSource = seriesList.Series;
+
+            ReloadFromDisk();
         }
 
         public bool IsDataModified
@@ -204,6 +209,11 @@ namespace SeriesUI
         }
 
         private void btnReload_Click(object sender, RoutedEventArgs e)
+        {
+            ReloadFromDisk();
+        }
+
+        private void ReloadFromDisk()
         {
             seriesList.ReloadFromDisk();
             SetEpisodeEventHandlers();
