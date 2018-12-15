@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -13,18 +14,15 @@ using SeriesUI.Common;
 using SeriesUI.Configuration;
 
 // TODO:
-// Andere kleuren? Omranden?
-// INotifyPropertyChanged:
-//     - refresh series list aan de praat krijgen: IsAsync gebruiken? (https://social.technet.microsoft.com/wiki/contents/articles/30203.wpf-asynchronous-data-binding-using-isasync-and-delay.aspx)
+// Andere kleuren? Omranden? 
 // Log to file
 // Why do we need to refresh in btnAllNlSubs_Click (and others) to update the grid?
 // ColorConfiguration class heeft 2 constructors die beiden worden gebruikt, we hebben dus 2 instances. Kijk of we met 1 af kunnen
 // warnings in xaml:  <configuration:ColorConfiguration x:Key="CompletenessToBrushConverter"/>, en anderen
 // alle warnings
 // Zie SetEpisodeEventHandlers: Is dit echt de enige manier om de eventhandler in deze class te krijgen?
-// Auto-load on startup
 // Auto-refresh in background and notify
-//WebClient vervangen door HttpClient(URI)
+// WebClient vervangen door HttpClient(URI)
 
 namespace SeriesUI
 {
@@ -41,9 +39,6 @@ namespace SeriesUI
         private readonly ColorConfiguration colorConfiguration;
         private readonly IConfigurationService configurationService;
         private readonly SeriesList seriesList;
-
-        delegate void StartRefreshSeries();
-        delegate void UpdateSeriesList(object sender, EventArgs e);
 
         public MainWindow()
         {
@@ -188,29 +183,44 @@ namespace SeriesUI
             return label;
         }
 
-        private void btnRefresh_Click(object sender, RoutedEventArgs e)
+        private async void btnRefresh_Click(object sender, RoutedEventArgs e)
         {
+            // Setting btnSave to enabled would break the binding
+            var saveEnabled = BindingOperations.GetBindingBase(btnSave, IsEnabledProperty);
+
             try
             {
-                labelTotalRefresh.Content = "/" + configurationService.SeriesConfigCollection.Count.ToString();
+                labelTotalRefresh.Content = "/" + configurationService.SeriesConfigCollection.Count;
                 labelCurrentRefresh.Content = "0";
 
-                // Create delegate
-                var refreshSeries = new StartRefreshSeries(RefreshSeries);
+                btnRefresh.IsEnabled = false;
+                btnSave.IsEnabled = false;
+                btnReload.IsEnabled = false;
+
                 Cursor = Cursors.Wait;
 
-                refreshSeries.BeginInvoke(null, null);
-
+                var task = RefreshSeries();
+                var dummy = await task;
             }
             finally
             {
                 Cursor = Cursors.Arrow;
+
+                btnRefresh.IsEnabled = true;
+
+                btnSave.SetBinding(IsEnabledProperty, saveEnabled);
+                btnReload.IsEnabled = true;
+
+                labelTotalRefresh.Content = "";
+                labelCurrentRefresh.Content = "";
             }
         }
 
-        private void RefreshSeries()
+        private async Task<int> RefreshSeries()
         {
-            seriesList.Refresh();
+            await Task.Run(() => seriesList.Refresh());
+
+            return 1;
         }
 
         private void btnSave_Click(object sender, RoutedEventArgs e)
@@ -263,8 +273,8 @@ namespace SeriesUI
         private void SetEpisodeEventHandlers(Series series)
         {
             foreach (var season in series.Seasons)
-                foreach (var episode in season.Episodes)
-                    episode.PropertyChanged += EpisodeChangeHandler;
+            foreach (var episode in season.Episodes)
+                episode.PropertyChanged += EpisodeChangeHandler;
         }
 
         private void SetEpisodeEventHandlers()
@@ -289,20 +299,22 @@ namespace SeriesUI
             {
                 // We are on the UI thread
                 listBoxSeries.Items.Refresh();
-                
+
                 // Update any new episodes
                 if (sender is Series)
                 {
                     SetEpisodeEventHandlers(sender as Series);
                     labelCurrentRefresh.Content = int.Parse(labelCurrentRefresh.Content.ToString()) + 1;
                 }
-                
+
                 IsDataModified = true;
             }
             else
             {
+                var formHandler = new UpdateSeriesList(SeriesListChangeHandler);
+
                 // Let the Forms dispatcher handle this call on the UI thread
-                this.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new UpdateSeriesList(SeriesListChangeHandler), sender, e);
+                Dispatcher.BeginInvoke(DispatcherPriority.Normal, formHandler, sender, e);
             }
         }
 
@@ -357,5 +369,7 @@ namespace SeriesUI
                 }
             }
         }
+
+        private delegate void UpdateSeriesList(object sender, EventArgs e);
     }
 }

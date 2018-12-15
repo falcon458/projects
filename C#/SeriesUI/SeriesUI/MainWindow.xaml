@@ -86,7 +86,7 @@
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
-        <Label x:Name="labelCurrentRefresh" Content="" HorizontalAlignment="Left" Margin="43,526,0,0" VerticalAlignment="Top" Width="19"/>
-        <Label x:Name="labelTotalRefresh" Content="" HorizontalAlignment="Left" Margin="62,526,0,0" VerticalAlignment="Top" Width="36"/>
+        <Label x:Name="labelCurrentRefresh" Content="" HorizontalAlignment="Left" Margin="43,526,0,0" VerticalAlignment="Top" Width="23"/>
+        <Label x:Name="labelTotalRefresh" Content="" HorizontalAlignment="Left" Margin="66,526,0,0" VerticalAlignment="Top" Width="36"/>
     </Grid>
 </Window>
