@@ -1,25 +1,29 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Windows;
 using SeriesUI.Configuration;
 
 namespace SeriesUI.BusinessLogic
 {
     internal class SeriesList
     {
+        public event EventHandler<EventArgs> SeriesChanged;
+
         private readonly IConfigurationService configurationService;
 
         public SeriesList(IConfigurationService configurationService)
         {
-            Series = new ObservableCollection<Series>();
+            Series = new List<Series>();
 
             this.configurationService = configurationService;
         }
 
-        public ObservableCollection<Series> Series { get; private set; }
+        public List<Series> Series { get; private set; }
 
         public void ReloadFromDisk()
         {
@@ -32,7 +36,7 @@ namespace SeriesUI.BusinessLogic
             var buffer = File.OpenRead(fileName);
 
             // Invoke the Deserialize method. This yields a new Series object
-            Series = formatter.Deserialize(buffer) as ObservableCollection<Series>;
+            Series = formatter.Deserialize(buffer) as List<Series>;
 
             // Close the stream.
             buffer.Close();
@@ -50,8 +54,17 @@ namespace SeriesUI.BusinessLogic
 
         public void Refresh()
         {
-            // Load the series into a new list of Series
-            var newSeries = new ObservableCollection<Series>();
+            // Store the series into a new list of Series
+            var oldSeries = new List<Series>();
+
+            // Move the series to the new list
+            foreach ( var series in Series)
+            {
+                oldSeries.Add(series);
+            }
+
+            // Empty the old list
+            ClearSeries();
 
             var placeHolder = configurationService.SeriesPlaceHolder.text;
 
@@ -66,38 +79,41 @@ namespace SeriesUI.BusinessLogic
                 };
 
                 series.GetDataFromWebsite();
-                newSeries.Add(series);
+
+                MergeListOfSeries(oldSeries, series);
+
+                //                newSeries.Add(series);
+                Series.Add(series);
+                OnSeriesChanged(series, EventArgs.Empty);
             }
-
-            MergeListOfSeries(Series, newSeries);
-
-            ClearSeries();
-
-            // Move the series. Setting Series to newSeries would mess up binding with the listBox
-            foreach (var series in newSeries) Series.Add(series);
         }
 
-        private void MergeListOfSeries(ObservableCollection<Series> oldSeries, ObservableCollection<Series> newSeries)
+        private void MergeListOfSeries(List<Series> oldSeriesList, Series newSeries)
         {
-            foreach (var newSeriesEntry in newSeries)
-            foreach (var newSeasonEntry in newSeriesEntry.Seasons)
-            foreach (var newEpisodeEntry in newSeasonEntry.Episodes)
-                // Combining these if statements gives "Possible NullRefException)
-                if (oldSeries.FirstOrDefault(c => c.Name == newSeriesEntry.Name) is Series oldSeriesEntry)
-                    if (oldSeriesEntry.Seasons.FirstOrDefault(d => d.Sequence == newSeasonEntry.Sequence) is Season
-                        oldSeasonEntry)
-                        if (oldSeasonEntry.Episodes.FirstOrDefault(e => e.Number == newEpisodeEntry.Number) is Episode
-                            oldEpisodeEntry)
-                        {
-                            newEpisodeEntry.Downloaded = oldEpisodeEntry.Downloaded;
-                            newEpisodeEntry.SubTitleEn = oldEpisodeEntry.SubTitleEn;
-                            newEpisodeEntry.SubTitleNl = oldEpisodeEntry.SubTitleNl;
-                        }
+                foreach (var newSeasonEntry in newSeries.Seasons)
+                    foreach (var newEpisodeEntry in newSeasonEntry.Episodes)
+                        // Combining these if statements gives "Possible NullRefException)
+                        if (oldSeriesList.FirstOrDefault(c => c.Name == newSeries.Name) is Series oldSeriesEntry)
+                            if (oldSeriesEntry.Seasons.FirstOrDefault(d => d.Sequence == newSeasonEntry.Sequence) is Season
+                                oldSeasonEntry)
+                                if (oldSeasonEntry.Episodes.FirstOrDefault(e => e.Number == newEpisodeEntry.Number) is Episode
+                                    oldEpisodeEntry)
+                                {
+                                    newEpisodeEntry.Downloaded = oldEpisodeEntry.Downloaded;
+                                    newEpisodeEntry.SubTitleEn = oldEpisodeEntry.SubTitleEn;
+                                    newEpisodeEntry.SubTitleNl = oldEpisodeEntry.SubTitleNl;
+                                }
         }
 
         public void ClearSeries()
         {
             Series.Clear();
+            OnSeriesChanged(this, EventArgs.Empty);
+        }
+
+        public void OnSeriesChanged(Object sender, EventArgs e)
+        {
+            SeriesChanged?.Invoke(sender, e);
         }
     }
 }

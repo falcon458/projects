@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 using SeriesUI.BusinessLogic;
 using SeriesUI.Common;
 using SeriesUI.Configuration;
@@ -41,6 +42,9 @@ namespace SeriesUI
         private readonly IConfigurationService configurationService;
         private readonly SeriesList seriesList;
 
+        delegate void StartRefreshSeries();
+        delegate void UpdateSeriesList(object sender, EventArgs e);
+
         public MainWindow()
         {
             InitializeComponent();
@@ -50,7 +54,7 @@ namespace SeriesUI
             colorConfiguration = new ColorConfiguration(configurationService);
 
             seriesList = new SeriesList(configurationService);
-            seriesList.Series.CollectionChanged += SeriesListChangeHandler;
+            seriesList.SeriesChanged += SeriesListChangeHandler;
 
             listBoxSeries.ItemsSource = seriesList.Series;
 
@@ -188,18 +192,25 @@ namespace SeriesUI
         {
             try
             {
+                labelTotalRefresh.Content = "/" + configurationService.SeriesConfigCollection.Count.ToString();
+                labelCurrentRefresh.Content = "0";
+
+                // Create delegate
+                var refreshSeries = new StartRefreshSeries(RefreshSeries);
                 Cursor = Cursors.Wait;
 
-                seriesList.Refresh();
-                SetEpisodeEventHandlers();
+                refreshSeries.BeginInvoke(null, null);
 
-                listBoxSeries.Items.Refresh();
-                IsDataModified = true;
             }
             finally
             {
                 Cursor = Cursors.Arrow;
             }
+        }
+
+        private void RefreshSeries()
+        {
+            seriesList.Refresh();
         }
 
         private void btnSave_Click(object sender, RoutedEventArgs e)
@@ -249,6 +260,13 @@ namespace SeriesUI
             grdEpisodes.Items.Refresh();
         }
 
+        private void SetEpisodeEventHandlers(Series series)
+        {
+            foreach (var season in series.Seasons)
+                foreach (var episode in season.Episodes)
+                    episode.PropertyChanged += EpisodeChangeHandler;
+        }
+
         private void SetEpisodeEventHandlers()
         {
             foreach (var series in seriesList.Series)
@@ -265,10 +283,27 @@ namespace SeriesUI
             listBoxSeries.Items.Refresh();
         }
 
-        private void SeriesListChangeHandler(object sender, NotifyCollectionChangedEventArgs e)
+        private void SeriesListChangeHandler(object sender, EventArgs e)
         {
-            listBoxSeries.Items.Refresh();
-            IsDataModified = true;
+            if (listBoxSeries.Dispatcher.CheckAccess())
+            {
+                // We are on the UI thread
+                listBoxSeries.Items.Refresh();
+                
+                // Update any new episodes
+                if (sender is Series)
+                {
+                    SetEpisodeEventHandlers(sender as Series);
+                    labelCurrentRefresh.Content = int.Parse(labelCurrentRefresh.Content.ToString()) + 1;
+                }
+                
+                IsDataModified = true;
+            }
+            else
+            {
+                // Let the Forms dispatcher handle this call on the UI thread
+                this.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new UpdateSeriesList(SeriesListChangeHandler), sender, e);
+            }
         }
 
         private void SetActiveLabelColor()
