@@ -59,13 +59,10 @@ namespace SeriesUI.BusinessLogic
 
         private void GetEpisodes()
         {
-            var webPage = new WebPage();
-
             for (var i = 1; i <= Seasons.Count; i++)
             {
                 // Retrieve page source
-                webPage.Url = $"{WebSite}{LocalUrl}/{i}";
-                webPage.getCode();
+                var webPage = new WebPage($"{WebSite}{LocalUrl}/{i}");
 
                 // Extract the episodes
                 var regex = new Regex(

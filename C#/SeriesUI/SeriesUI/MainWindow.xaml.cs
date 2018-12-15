@@ -22,7 +22,6 @@ using SeriesUI.Configuration;
 // alle warnings
 // Zie SetEpisodeEventHandlers: Is dit echt de enige manier om de eventhandler in deze class te krijgen?
 // Auto-refresh in background and notify
-// WebClient vervangen door HttpClient(URI)
 
 namespace SeriesUI
 {
