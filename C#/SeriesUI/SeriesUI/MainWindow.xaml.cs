@@ -135,7 +135,7 @@ namespace SeriesUI
                 label.Background = LabelBackGround(labelSeason - 1, false);
         }
 
-        private void listBoxSeries_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ListBoxSeries_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             DeleteSeasonLabels();
             grdEpisodes.ItemsSource = null;
@@ -182,7 +182,7 @@ namespace SeriesUI
             return label;
         }
 
-        private async void btnRefresh_Click(object sender, RoutedEventArgs e)
+        private async void BtnRefresh_Click(object sender, RoutedEventArgs e)
         {
             // Setting btnSave to "enabled" would break the binding
             var saveEnabled = BindingOperations.GetBindingBase(btnSave, IsEnabledProperty);
@@ -222,13 +222,13 @@ namespace SeriesUI
             return 1;
         }
 
-        private void btnSave_Click(object sender, RoutedEventArgs e)
+        private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
             seriesList.SaveToDisk();
             IsDataModified = false;
         }
 
-        private void btnReload_Click(object sender, RoutedEventArgs e)
+        private void BtnReload_Click(object sender, RoutedEventArgs e)
         {
             ReloadFromDisk();
         }
@@ -328,7 +328,7 @@ namespace SeriesUI
                     SetLabelBackground(label, true);
         }
 
-        private void btnDebug_Click(object sender, RoutedEventArgs e)
+        private void BtnDebug_Click(object sender, RoutedEventArgs e)
         {
             foreach (var entryItem in listBoxSeries.Items)
                 if (entryItem is Series)
@@ -351,7 +351,7 @@ namespace SeriesUI
             //EventPrivateKey bindingsource
         }
 
-        private void mainWindow_Closing(object sender, CancelEventArgs e)
+        private void MainWindow_Closing(object sender, CancelEventArgs e)
         {
             if (IsDataModified)
             {

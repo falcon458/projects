@@ -1,9 +1,10 @@
 ﻿using System.Net;
 using System.Text;
+using SeriesUI.Interfaces;
 
 namespace SeriesUI.BusinessLogic
 {
-    internal class WebPage
+    internal class WebPage : IWebPage
     {
         public WebPage(string url)
         {
@@ -14,13 +15,12 @@ namespace SeriesUI.BusinessLogic
             }
         }
 
-        public string Url { get; set; }
+        public string Url { get; }
         public string PageSource { get; set; }
 
         private void GetPageSource()
         {
-            var webClient = new WebClient();
-            webClient.Encoding = Encoding.UTF8;
+            var webClient = new WebClient {Encoding = Encoding.UTF8};
             var html = webClient.DownloadString(Url);
 
             PageSource = html;

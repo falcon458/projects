@@ -82,6 +82,7 @@
     <Compile Include="Configuration\SaveFile.cs" />
     <Compile Include="Configuration\SeriesWebSite.cs" />
     <Compile Include="Configuration\SeriesWebSiteLocation.cs" />
+    <Compile Include="Interfaces\Interface1.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -116,6 +117,11 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Windows\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="log4net">
+      <Version>2.0.8</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

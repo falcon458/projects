@@ -7,14 +7,14 @@
         xmlns:configuration="clr-namespace:SeriesUI.Configuration"
         mc:Ignorable="d"
         Name="mainWindow"
-        Title="Series" Height="589.767" Width="1007.225" Closing="mainWindow_Closing">
+        Title="Series" Height="589.767" Width="1007.225" Closing="MainWindow_Closing">
     <Window.Resources>
         <configuration:ColorConfiguration x:Key="CompletenessToBrushConverter" />
     </Window.Resources>
     <Grid Margin="0,-24,0,0">
         <ListBox x:Name="listBoxSeries" DisplayMemberPath="Name" HorizontalAlignment="Left" Height="353"
                  Margin="25,70,0,0" VerticalAlignment="Top" Width="187"
-                 SelectionChanged="listBoxSeries_SelectionChanged" ItemsSource="{Binding Name}">
+                 SelectionChanged="ListBoxSeries_SelectionChanged" ItemsSource="{Binding Name}">
 
             <ListBox.Resources>
                 <Style TargetType="ListBoxItem">
@@ -27,13 +27,13 @@
         </ListBox>
         <Grid x:Name="grdSeasons" Height="40" Margin="229,25,10,0" VerticalAlignment="Top" />
         <Button x:Name="btnSave" Content="Save" HorizontalAlignment="Left" Margin="42,494,0,0" VerticalAlignment="Top"
-                Width="75" Click="btnSave_Click" IsEnabled="{Binding IsDataModified, ElementName=mainWindow}" />
+                Width="75" Click="BtnSave_Click" IsEnabled="{Binding IsDataModified, ElementName=mainWindow}" />
         <Button x:Name="btnRefresh" Content="Refresh" HorizontalAlignment="Left" Margin="42,444,0,0"
-                VerticalAlignment="Top" Width="75" Click="btnRefresh_Click" />
+                VerticalAlignment="Top" Width="75" Click="BtnRefresh_Click" />
         <Button x:Name="btnReload" Content="Reload" HorizontalAlignment="Left" Margin="42,469,0,0"
-                VerticalAlignment="Top" Width="75" Click="btnReload_Click" />
+                VerticalAlignment="Top" Width="75" Click="BtnReload_Click" />
         <Button x:Name="btnDebug" Content="Debug" HorizontalAlignment="Left" Margin="137,529,0,0"
-                VerticalAlignment="Top" Width="75" RenderTransformOrigin="-0.025,-0.338" Click="btnDebug_Click" />
+                VerticalAlignment="Top" Width="75" RenderTransformOrigin="-0.025,-0.338" Click="BtnDebug_Click" />
         <DataGrid x:Name="grdEpisodes" Margin="229,70,10,10" AutoGenerateColumns="False" FontFamily="Verdana"
                   SelectionMode="Single" SelectionUnit="Cell">
             <DataGrid.RowStyle>

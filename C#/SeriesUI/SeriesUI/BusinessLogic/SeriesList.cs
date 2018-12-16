@@ -1,19 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Windows;
 using SeriesUI.Configuration;
 
 namespace SeriesUI.BusinessLogic
 {
     internal class SeriesList
     {
-        public event EventHandler<EventArgs> SeriesChanged;
-
         private readonly IConfigurationService configurationService;
 
         public SeriesList(IConfigurationService configurationService)
@@ -24,6 +20,8 @@ namespace SeriesUI.BusinessLogic
         }
 
         public List<Series> Series { get; private set; }
+
+        public event EventHandler<EventArgs> SeriesChanged;
 
         public void ReloadFromDisk()
         {
@@ -58,10 +56,7 @@ namespace SeriesUI.BusinessLogic
             var oldSeries = new List<Series>();
 
             // Move the series to the new list
-            foreach ( var series in Series)
-            {
-                oldSeries.Add(series);
-            }
+            foreach (var series in Series) oldSeries.Add(series);
 
             // Empty the old list
             ClearSeries();
@@ -82,7 +77,6 @@ namespace SeriesUI.BusinessLogic
 
                 MergeListOfSeries(oldSeries, series);
 
-                //                newSeries.Add(series);
                 Series.Add(series);
                 OnSeriesChanged(series, EventArgs.Empty);
             }
@@ -90,28 +84,28 @@ namespace SeriesUI.BusinessLogic
 
         private void MergeListOfSeries(List<Series> oldSeriesList, Series newSeries)
         {
-                foreach (var newSeasonEntry in newSeries.Seasons)
-                    foreach (var newEpisodeEntry in newSeasonEntry.Episodes)
-                        // Combining these if statements gives "Possible NullRefException)
-                        if (oldSeriesList.FirstOrDefault(c => c.Name == newSeries.Name) is Series oldSeriesEntry)
-                            if (oldSeriesEntry.Seasons.FirstOrDefault(d => d.Sequence == newSeasonEntry.Sequence) is Season
-                                oldSeasonEntry)
-                                if (oldSeasonEntry.Episodes.FirstOrDefault(e => e.Number == newEpisodeEntry.Number) is Episode
-                                    oldEpisodeEntry)
-                                {
-                                    newEpisodeEntry.Downloaded = oldEpisodeEntry.Downloaded;
-                                    newEpisodeEntry.SubTitleEn = oldEpisodeEntry.SubTitleEn;
-                                    newEpisodeEntry.SubTitleNl = oldEpisodeEntry.SubTitleNl;
-                                }
+            foreach (var newSeasonEntry in newSeries.Seasons)
+            foreach (var newEpisodeEntry in newSeasonEntry.Episodes)
+                // Combining these if statements gives "Possible NullRefException)
+                if (oldSeriesList.FirstOrDefault(c => c.Name == newSeries.Name) is Series oldSeriesEntry)
+                    if (oldSeriesEntry.Seasons.FirstOrDefault(d => d.Sequence == newSeasonEntry.Sequence) is Season
+                        oldSeasonEntry)
+                        if (oldSeasonEntry.Episodes.FirstOrDefault(e => e.Number == newEpisodeEntry.Number) is Episode
+                            oldEpisodeEntry)
+                        {
+                            newEpisodeEntry.Downloaded = oldEpisodeEntry.Downloaded;
+                            newEpisodeEntry.SubTitleEn = oldEpisodeEntry.SubTitleEn;
+                            newEpisodeEntry.SubTitleNl = oldEpisodeEntry.SubTitleNl;
+                        }
         }
 
-        public void ClearSeries()
+        private void ClearSeries()
         {
             Series.Clear();
             OnSeriesChanged(this, EventArgs.Empty);
         }
 
-        public void OnSeriesChanged(Object sender, EventArgs e)
+        private void OnSeriesChanged(object sender, EventArgs e)
         {
             SeriesChanged?.Invoke(sender, e);
         }

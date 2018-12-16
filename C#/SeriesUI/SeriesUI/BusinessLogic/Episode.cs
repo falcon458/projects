@@ -32,7 +32,7 @@ namespace SeriesUI.BusinessLogic
 
         public string Number { get; set; }
 
-    public bool Downloaded
+        public bool Downloaded
         {
             get => downloaded;
             set
