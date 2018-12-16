@@ -184,7 +184,7 @@ namespace SeriesUI
 
         private async void btnRefresh_Click(object sender, RoutedEventArgs e)
         {
-            // Setting btnSave to enabled would break the binding
+            // Setting btnSave to "enabled" would break the binding
             var saveEnabled = BindingOperations.GetBindingBase(btnSave, IsEnabledProperty);
 
             try
@@ -206,9 +206,9 @@ namespace SeriesUI
                 Cursor = Cursors.Arrow;
 
                 btnRefresh.IsEnabled = true;
+                btnReload.IsEnabled = true;
 
                 btnSave.SetBinding(IsEnabledProperty, saveEnabled);
-                btnReload.IsEnabled = true;
 
                 labelTotalRefresh.Content = "";
                 labelCurrentRefresh.Content = "";
@@ -303,7 +303,10 @@ namespace SeriesUI
                 if (sender is Series)
                 {
                     SetEpisodeEventHandlers(sender as Series);
-                    labelCurrentRefresh.Content = int.Parse(labelCurrentRefresh.Content.ToString()) + 1;
+
+                    // Use try-parse because this code may conflict with the part where we clear it after refresh
+                    if (int.TryParse(labelCurrentRefresh.Content.ToString(), out var currentNumber))
+                        labelCurrentRefresh.Content = currentNumber + 1;
                 }
 
                 IsDataModified = true;
