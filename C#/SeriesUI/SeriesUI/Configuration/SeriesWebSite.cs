@@ -4,6 +4,6 @@ namespace SeriesUI.Configuration
 {
     public class SeriesWebSite : ConfigurationElement
     {
-        [ConfigurationProperty("url")] public string url => (string) base["url"];
+        [ConfigurationProperty("url")] public string Url => (string) base["url"];
     }
 }

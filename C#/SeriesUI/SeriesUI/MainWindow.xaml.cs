@@ -19,7 +19,6 @@ using SeriesUI.Configuration;
 // Why do we need to refresh in btnAllNlSubs_Click (and others) to update the grid?
 // ColorConfiguration class heeft 2 constructors die beiden worden gebruikt, we hebben dus 2 instances. Kijk of we met 1 af kunnen
 // warnings in xaml:  <configuration:ColorConfiguration x:Key="CompletenessToBrushConverter"/>, en anderen
-// alle warnings
 // Zie SetEpisodeEventHandlers: Is dit echt de enige manier om de eventhandler in deze class te krijgen?
 // Auto-refresh in background and notify
 
@@ -28,7 +27,7 @@ namespace SeriesUI
     /// <summary>
     ///     Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
         // Using a DependencyProperty as the backing store for IsSaved
         public static readonly DependencyProperty IsModifiedProperty =
@@ -50,7 +49,7 @@ namespace SeriesUI
             seriesList = new SeriesList(configurationService);
             seriesList.SeriesChanged += SeriesListChangeHandler;
 
-            listBoxSeries.ItemsSource = seriesList.Series;
+            ListBoxSeries.ItemsSource = seriesList.Series;
 
             ReloadFromDisk();
         }
@@ -79,8 +78,8 @@ namespace SeriesUI
                 label.Background = LabelBackGround(ActiveSeason - 1, true);
 
                 // Show the episodes for this label's season
-                if (listBoxSeries.SelectedItem is Series series)
-                    grdEpisodes.ItemsSource = series.Seasons[ActiveSeason - 1].Episodes;
+                if (ListBoxSeries.SelectedItem is Series series)
+                    GrdEpisodes.ItemsSource = series.Seasons[ActiveSeason - 1].Episodes;
             }
         }
 
@@ -88,12 +87,12 @@ namespace SeriesUI
         {
             Brush result = null;
 
-            if (listBoxSeries.SelectedItem is Series series)
+            if (ListBoxSeries.SelectedItem is Series series)
             {
                 var key = new ColorPaletteKey(series.Seasons[season].Completeness, active, typeof(Label))
                     .GetHashCode();
 
-                result = colorConfiguration.colorPalette[key];
+                result = colorConfiguration.ColorPalette[key];
             }
 
             return result;
@@ -101,15 +100,15 @@ namespace SeriesUI
 
         private void DeleteSeasonLabels()
         {
-            foreach (var obj in grdSeasons.Children.OfType<Label>().Where(c => (c.Tag ?? "").ToString() == "temporary")
-                .ToList()) grdSeasons.Children.Remove(obj);
+            foreach (var obj in GrdSeasons.Children.OfType<Label>().Where(c => (c.Tag ?? "").ToString() == "temporary")
+                .ToList()) GrdSeasons.Children.Remove(obj);
 
             ActiveSeason = 0;
         }
 
         private void UnMarkSeasonLabels()
         {
-            foreach (var item in grdSeasons.Children)
+            foreach (var item in GrdSeasons.Children)
                 if (item is Label label && int.TryParse(label.Content.ToString(), out var labelSeason) &&
                     labelSeason != ActiveSeason)
                     label.Background = LabelBackGround(labelSeason - 1, false);
@@ -138,7 +137,7 @@ namespace SeriesUI
         private void ListBoxSeries_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             DeleteSeasonLabels();
-            grdEpisodes.ItemsSource = null;
+            GrdEpisodes.ItemsSource = null;
 
             var series = (sender as ListBox)?.SelectedItem as Series;
 
@@ -146,12 +145,12 @@ namespace SeriesUI
             {
                 var lbl = GetNewLabel(i);
 
-                grdSeasons.Children.Add(lbl);
+                GrdSeasons.Children.Add(lbl);
             }
 
             // Select last season
-            if (grdSeasons.Children.Count > 0)
-                OnLabelMouseClick(grdSeasons.Children[grdSeasons.Children.Count - 1], new EventArgs());
+            if (GrdSeasons.Children.Count > 0)
+                OnLabelMouseClick(GrdSeasons.Children[GrdSeasons.Children.Count - 1], new EventArgs());
         }
 
         private Label GetNewLabel(int sequence)
@@ -185,16 +184,16 @@ namespace SeriesUI
         private async void BtnRefresh_Click(object sender, RoutedEventArgs e)
         {
             // Setting btnSave to "enabled" would break the binding
-            var saveEnabled = BindingOperations.GetBindingBase(btnSave, IsEnabledProperty);
+            var saveEnabled = BindingOperations.GetBindingBase(BtnSave, IsEnabledProperty);
 
             try
             {
-                labelTotalRefresh.Content = "/" + configurationService.SeriesConfigCollection.Count;
-                labelCurrentRefresh.Content = "0";
+                LabelTotalRefresh.Content = "/" + configurationService.SeriesConfigCollection.Count;
+                LabelCurrentRefresh.Content = "0";
 
-                btnRefresh.IsEnabled = false;
-                btnSave.IsEnabled = false;
-                btnReload.IsEnabled = false;
+                BtnRefresh.IsEnabled = false;
+                BtnSave.IsEnabled = false;
+                BtnReload.IsEnabled = false;
 
                 Cursor = Cursors.Wait;
 
@@ -205,13 +204,13 @@ namespace SeriesUI
             {
                 Cursor = Cursors.Arrow;
 
-                btnRefresh.IsEnabled = true;
-                btnReload.IsEnabled = true;
+                BtnRefresh.IsEnabled = true;
+                BtnReload.IsEnabled = true;
 
-                btnSave.SetBinding(IsEnabledProperty, saveEnabled);
+                BtnSave.SetBinding(IsEnabledProperty, saveEnabled);
 
-                labelTotalRefresh.Content = "";
-                labelCurrentRefresh.Content = "";
+                LabelTotalRefresh.Content = "";
+                LabelCurrentRefresh.Content = "";
             }
         }
 
@@ -237,7 +236,7 @@ namespace SeriesUI
         {
             seriesList.ReloadFromDisk();
             SetEpisodeEventHandlers();
-            listBoxSeries.ItemsSource = seriesList.Series;
+            ListBoxSeries.ItemsSource = seriesList.Series;
             IsDataModified = false;
         }
 
@@ -248,15 +247,15 @@ namespace SeriesUI
             switch (header?.ToUpper())
             {
                 case "NL":
-                    ((Series) listBoxSeries.SelectedItems[0])?.Seasons[ActiveSeason - 1]
+                    ((Series) ListBoxSeries.SelectedItems[0])?.Seasons[ActiveSeason - 1]
                         .ToggleAllSubs(SubTitle.Nl);
                     break;
                 case "EN":
-                    ((Series) listBoxSeries.SelectedItems[0])?.Seasons[ActiveSeason - 1]
+                    ((Series) ListBoxSeries.SelectedItems[0])?.Seasons[ActiveSeason - 1]
                         .ToggleAllSubs(SubTitle.En);
                     break;
                 case "DOWNLOADED":
-                    ((Series) listBoxSeries.SelectedItems[0])?.Seasons[ActiveSeason - 1].ToggleDownloaded();
+                    ((Series) ListBoxSeries.SelectedItems[0])?.Seasons[ActiveSeason - 1].ToggleDownloaded();
                     break;
                 case "DATE":
                 case "TITLE":
@@ -266,7 +265,7 @@ namespace SeriesUI
                     break;
             }
 
-            grdEpisodes.Items.Refresh();
+            GrdEpisodes.Items.Refresh();
         }
 
         private void SetEpisodeEventHandlers(Series series)
@@ -286,18 +285,18 @@ namespace SeriesUI
 
         private void EpisodeChangeHandler(object sender, PropertyChangedEventArgs e)
         {
-            grdEpisodes.Items.Refresh();
+            GrdEpisodes.Items.Refresh();
             IsDataModified = true;
             SetActiveLabelColor();
-            listBoxSeries.Items.Refresh();
+            ListBoxSeries.Items.Refresh();
         }
 
         private void SeriesListChangeHandler(object sender, EventArgs e)
         {
-            if (listBoxSeries.Dispatcher.CheckAccess())
+            if (ListBoxSeries.Dispatcher.CheckAccess())
             {
                 // We are on the UI thread
-                listBoxSeries.Items.Refresh();
+                ListBoxSeries.Items.Refresh();
 
                 // Update any new episodes
                 if (sender is Series)
@@ -305,8 +304,8 @@ namespace SeriesUI
                     SetEpisodeEventHandlers(sender as Series);
 
                     // Use try-parse because this code may conflict with the part where we clear it after refresh
-                    if (int.TryParse(labelCurrentRefresh.Content.ToString(), out var currentNumber))
-                        labelCurrentRefresh.Content = currentNumber + 1;
+                    if (int.TryParse(LabelCurrentRefresh.Content.ToString(), out var currentNumber))
+                        LabelCurrentRefresh.Content = currentNumber + 1;
                 }
 
                 IsDataModified = true;
@@ -322,7 +321,7 @@ namespace SeriesUI
 
         private void SetActiveLabelColor()
         {
-            foreach (var item in grdSeasons.Children)
+            foreach (var item in GrdSeasons.Children)
                 if (item is Label label && int.TryParse(label.Content.ToString(), out var labelSeason) &&
                     labelSeason == ActiveSeason)
                     SetLabelBackground(label, true);
@@ -330,7 +329,7 @@ namespace SeriesUI
 
         private void BtnDebug_Click(object sender, RoutedEventArgs e)
         {
-            foreach (var entryItem in listBoxSeries.Items)
+            foreach (var entryItem in ListBoxSeries.Items)
                 if (entryItem is Series)
                 {
                     var series = entryItem as Series;

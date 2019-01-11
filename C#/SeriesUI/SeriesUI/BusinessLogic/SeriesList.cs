@@ -61,15 +61,15 @@ namespace SeriesUI.BusinessLogic
             // Empty the old list
             ClearSeries();
 
-            var placeHolder = configurationService.SeriesPlaceHolder.text;
+            var placeHolder = configurationService.SeriesPlaceHolder.Text;
 
             foreach (SeriesConfigElement newSeriesConfig in configurationService.SeriesConfigCollection)
             {
                 var series = new Series
                 {
                     Name = newSeriesConfig.Name,
-                    WebSite = configurationService.SeriesWebSite.url,
-                    LocalUrl = configurationService.SeriesWebSiteLocation.url.Replace(placeHolder,
+                    WebSite = configurationService.SeriesWebSite.Url,
+                    LocalUrl = configurationService.SeriesWebSiteLocation.Url.Replace(placeHolder,
                         newSeriesConfig.Name.Replace(" ", "-").ToLower())
                 };
 

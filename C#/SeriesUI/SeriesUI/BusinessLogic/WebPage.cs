@@ -8,22 +8,20 @@ namespace SeriesUI.BusinessLogic
     {
         public WebPage(string url)
         {
-            if (!string.IsNullOrEmpty(url))
-            {
-                Url = url;
-                GetPageSource();
-            }
+            if (!string.IsNullOrEmpty(url)) Url = url;
         }
 
         public string Url { get; }
         public string PageSource { get; set; }
 
-        private void GetPageSource()
+        #region IWebPage members
+
+        public string GetPageSource()
         {
             var webClient = new WebClient {Encoding = Encoding.UTF8};
             var html = webClient.DownloadString(Url);
 
-            PageSource = html;
+            return html;
 
             /* For reference: HttpClient is the new standard, but for us much slower
             var client = new HttpClient();
@@ -35,5 +33,7 @@ namespace SeriesUI.BusinessLogic
             if (result != null) PageSource = result;
             */
         }
+
+        #endregion
     }
 }

@@ -4,6 +4,6 @@ namespace SeriesUI.Configuration
 {
     public class SeriesPlaceHolder : ConfigurationElement
     {
-        [ConfigurationProperty("text")] public string text => (string) base["text"];
+        [ConfigurationProperty("text")] public string Text => (string) base["text"];
     }
 }

@@ -65,13 +65,6 @@ namespace SeriesUI.BusinessLogic
             }
         }
 
-        private CompletenessState Max(CompletenessState arg1, CompletenessState arg2)
-        {
-            var result = (CompletenessState) Math.Max((int) arg1, (int) arg2);
-
-            return result;
-        }
-
         public void SetAllSubs(SubTitle sub)
         {
             foreach (var episode in Episodes)

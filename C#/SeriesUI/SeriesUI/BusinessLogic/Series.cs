@@ -44,10 +44,10 @@ namespace SeriesUI.BusinessLogic
         private void GetSeasons()
         {
             var webPage = new WebPage($"{WebSite}{LocalUrl}/1");
+            webPage.PageSource = webPage.GetPageSource();
 
             // Extract the seasons
             var regex = new Regex($@"href=""{LocalUrl}/(\d+)");
-            var matchlist = (from Match m in regex.Matches($"{webPage.PageSource}") select m.Groups[1]).ToList();
 
             // Store the season numbers
             foreach (var match in (from Match m in regex.Matches($"{webPage.PageSource}") select m.Groups[1]).ToList())
@@ -63,6 +63,7 @@ namespace SeriesUI.BusinessLogic
             {
                 // Retrieve page source
                 var webPage = new WebPage($"{WebSite}{LocalUrl}/{i}");
+                webPage.PageSource = webPage.GetPageSource();
 
                 // Extract the episodes
                 var regex = new Regex(

@@ -28,7 +28,7 @@ namespace SeriesUI.BusinessLogic
 
         public DateTime AirDate { get; set; }
 
-        public string Title { get; set; }
+        public string Title { get; }
 
         public string Number { get; set; }
 
