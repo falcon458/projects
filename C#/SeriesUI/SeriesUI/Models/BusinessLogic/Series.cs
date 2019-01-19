@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
-using SeriesUI.Common;
+using SeriesUI.Models.Common;
 
 namespace SeriesUI.BusinessLogic
 {
@@ -54,7 +54,7 @@ namespace SeriesUI.BusinessLogic
                 if (int.TryParse(match.Value, out var intValue))
                     Seasons.Add(new Season(intValue));
                 else
-                    Common.Common.Log($"ERROR: Non-numeric match for season: {match.Value}");
+                    Common.Log($"ERROR: Non-numeric match for season: {match.Value}");
         }
 
         private void GetEpisodes()
@@ -75,7 +75,7 @@ namespace SeriesUI.BusinessLogic
 
                 // Verify number of episodes and dates
                 if (episodeDates.Count != episodeNames.Count || episodeDates.Count == 0)
-                    Common.Common.Log(
+                    Common.Log(
                         $"ERROR: Unequal or zero number of episodes ({episodeNames.Count}) and dates ({episodeDates.Count}) for \"{Name}\", season {i}");
                 else
                     for (var j = 0; j < episodeNames.Count; j++)

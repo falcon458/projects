@@ -9,9 +9,10 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using Catel.Services;
 using SeriesUI.BusinessLogic;
-using SeriesUI.Common;
 using SeriesUI.Configuration;
+using SeriesUI.Models.Common;
 
 // TODO:
 // Andere kleuren? Omranden? 
@@ -261,7 +262,7 @@ namespace SeriesUI
                 case "TITLE":
                     break;
                 default:
-                    Common.Common.Log($"ERROR: Non-coded column header: {header}");
+                    Common.Log($"ERROR: Non-coded column header: {header}");
                     break;
             }
 
@@ -335,36 +336,23 @@ namespace SeriesUI
                     var series = entryItem as Series;
 
                     // Select the worst completeness
-                    MessageBox.Show(series.Name + ": " + series.Completeness);
+                    Dialog.Show(series.Name + ": " + series.Completeness);
                 }
-
-            //IsSavedButtonActive = !IsSavedButtonActive;
-            //MessageBox.Show(IsSavedButtonActive.ToString());
-
-            // grdEpisodes.Items.Refresh();
-
-            // ((Series) listBoxSeries.SelectedItems[0]).Seasons[ActiveSeason - 1].Episodes[0].PropertyChanged += Tst;
-
-            //dummyEpisode.PropertyChanged += new PropertyChangedEventHandler(Tst);
-
-            //EventPrivateKey bindingsource
         }
 
         private void MainWindow_Closing(object sender, CancelEventArgs e)
         {
             if (IsDataModified)
             {
-                var reply = MessageBox.Show("Do you want to save the changes?", "Unsaved Changes!",
-                    MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
-
+                var reply = Dialog.ShowDialog("Do you want to save the changes?", "Unsaved changes", MessageButton.YesNoCancel, MessageImage.Question);
                 switch (reply)
                 {
-                    case MessageBoxResult.No:
+                    case MessageResult.No:
                         break;
-                    case MessageBoxResult.Yes:
+                    case MessageResult.Yes:
                         seriesList.SaveToDisk();
                         break;
-                    case MessageBoxResult.Cancel:
+                    case MessageResult.Cancel:
                         e.Cancel = true;
                         break;
                 }

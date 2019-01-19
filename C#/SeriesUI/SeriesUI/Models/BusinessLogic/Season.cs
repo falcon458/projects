@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SeriesUI.Common;
+using SeriesUI.Models.Common;
 
 namespace SeriesUI.BusinessLogic
 {

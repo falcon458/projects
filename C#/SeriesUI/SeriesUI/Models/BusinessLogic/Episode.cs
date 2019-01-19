@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using SeriesUI.Annotations;
-using SeriesUI.Common;
+using SeriesUI.Models.Common;
 
 namespace SeriesUI.BusinessLogic
 {

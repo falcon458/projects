@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using SeriesUI.Configuration;
+using SeriesUI.Models.Common;
 
 namespace SeriesUI.BusinessLogic
 {
@@ -34,10 +35,19 @@ namespace SeriesUI.BusinessLogic
             var buffer = File.OpenRead(fileName);
 
             // Invoke the Deserialize method. This yields a new Series object
-            Series = formatter.Deserialize(buffer) as List<Series>;
-
-            // Close the stream.
-            buffer.Close();
+            try
+            {
+                Series = formatter.Deserialize(buffer) as List<Series>;
+            }
+            catch (Exception e)
+            {
+                Dialog.ShowError("An error occurred while reading the data file.");
+            }
+            finally
+            {
+                // Close the stream.
+                buffer.Close();
+            }
         }
 
         public void SaveToDisk()

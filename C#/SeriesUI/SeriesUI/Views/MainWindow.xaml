@@ -5,13 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:configuration="clr-namespace:SeriesUI.Configuration"
         xmlns:businessLogic="clr-namespace:SeriesUI.BusinessLogic"
+        xmlns:viewModels="clr-namespace:SeriesUI.ViewModels"
         mc:Ignorable="d"
         Name="ThisWindow"
         Title="Series" Height="589.767" Width="1007.225" Closing="MainWindow_Closing">
     <Window.Resources>
+        <viewModels:MainViewModel x:Key="MainViewModel"/>
         <configuration:ColorConfiguration x:Key="CompletenessToBrushConverter" />
     </Window.Resources>
-    <Grid Margin="0,-24,0,0" d:DataContext="{d:DesignData }">
+    <Grid Margin="0,-24,0,0" DataContext="{StaticResource MainViewModel}">
         <ListBox x:Name="ListBoxSeries" DisplayMemberPath="Name" HorizontalAlignment="Left" Height="353"
                  Margin="25,70,0,0" VerticalAlignment="Top" Width="187"
                  SelectionChanged="ListBoxSeries_SelectionChanged" ItemsSource="{Binding Name}">
@@ -35,7 +37,7 @@
         <Button x:Name="BtnDebug" Content="Debug" HorizontalAlignment="Left" Margin="137,529,0,0"
                 VerticalAlignment="Top" Width="75" RenderTransformOrigin="-0.025,-0.338" Click="BtnDebug_Click" />
         <DataGrid x:Name="GrdEpisodes" Margin="229,70,10,10" AutoGenerateColumns="False" FontFamily="Verdana"
-                  SelectionMode="Single" SelectionUnit="Cell" d:DataContext="{d:DesignInstance d:Type=businessLogic:Episode}">
+                  SelectionMode="Single" SelectionUnit="Cell" d:DataContext="{d:DesignInstance Type=businessLogic:Episode}">
             <DataGrid.RowStyle>
                 <Style TargetType="DataGridRow">
                     <Setter Property="Background"

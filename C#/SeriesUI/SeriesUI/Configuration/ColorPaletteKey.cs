@@ -1,5 +1,5 @@
 ﻿using System;
-using SeriesUI.Common;
+using SeriesUI.Models.Common;
 
 namespace SeriesUI.Configuration
 {
